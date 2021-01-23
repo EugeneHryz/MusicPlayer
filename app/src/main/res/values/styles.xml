@@ -1,0 +1,107 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/musicplayer_light_gray</item>
+        <item name="colorOnPrimary">@color/musicplayer_white</item>
+        <item name="colorPrimaryDark">@color/musicplayer_black</item>
+        <item name="android:colorBackground">@color/musicplayer_dark_gray</item>
+        <item name="android:textColorSecondary">@color/musicplayer_white</item>
+
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/PopupMenuTextAppearanceLarge</item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/PopupMenuTextAppearanceSmall</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AppCompat.Translucent" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="TextAppearance.MusicPlayer.TextHuge" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textColor">@color/musicplayer_white</item>
+        <item name="android:textSize">@dimen/huge_text_size</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextBiggest" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textColor">@color/musicplayer_white</item>
+        <item name="android:textSize">@dimen/biggest_text_size</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextBiggest.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextBiggestDim" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textColor">@color/musicplayer_dim_white</item>
+        <item name="android:textSize">@dimen/biggest_text_size</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextBiggestDim.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextHuge.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextLarge" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/musicplayer_white</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextMedium" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/musicplayer_white</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextMedium.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextRegular" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/musicplayer_white</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextSmall" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textColor">@color/musicplayer_white</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextTiny" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/musicplayer_white</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextRegular.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
+        <item name="android:textColor">@color/musicplayer_white</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
+        <item name="android:popupBackground">@color/musicplayer_black</item>
+        <item name="android:colorBackground">@drawable/ripple_dark</item>
+    </style>
+
+    <style name="PopupMenuTextAppearanceSmall" parent="@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Small">
+        <item name="android:textColor">@color/musicplayer_white</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
+    </style>
+
+    <style name="PopupMenuTextAppearanceLarge" parent="@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Large">
+        <item name="android:textColor">@color/musicplayer_white</item>
+        <item name="android:textSize">@dimen/large_text_size</item>
+    </style>
+
+</resources>

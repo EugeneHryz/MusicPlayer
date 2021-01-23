@@ -1,0 +1,51 @@
+package com.example.musicplayer;
+
+import android.content.Context;
+import android.graphics.Rect;
+import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+
+import com.example.musicplayer.R;
+
+public class PlayerScreenMotionLayout extends MotionLayout {
+
+    private GestureDetector gestureDetector;
+    private View viewToDetectTouch;
+    private boolean touchHasStarted = false;
+    private Rect viewRect = new Rect();
+
+    public PlayerScreenMotionLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+
+        gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                transitionToEnd();
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        viewToDetectTouch = this.findViewById(R.id.player_background_view);
+        gestureDetector.onTouchEvent(event);
+        if (event.getActionMasked() == MotionEvent.ACTION_UP ||
+                event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
+            touchHasStarted = false;
+            return super.onTouchEvent(event);
+        }
+
+        if (!touchHasStarted) {
+            viewToDetectTouch.getHitRect(viewRect);
+            touchHasStarted = viewRect.contains((int)event.getX(), (int)event.getY());
+        }
+        return touchHasStarted && super.onTouchEvent(event);
+    }
+}

@@ -7,6 +7,6 @@
     </size>
 
     <solid
-        android:color="@color/musicplayer_dirty_gray">
+        android:color="@color/musicplayer_item_divider_light_gray">
     </solid>
 </shape>

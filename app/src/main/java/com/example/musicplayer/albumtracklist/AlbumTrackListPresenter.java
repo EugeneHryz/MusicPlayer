@@ -1,8 +1,13 @@
 package com.example.musicplayer.albumtracklist;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -11,8 +16,10 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.musicplayer.Album;
 import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.MusicDataProvider;
+import com.example.musicplayer.MusicService;
 import com.example.musicplayer.PlayerControlsFragment;
 import com.example.musicplayer.R;
+import com.example.musicplayer.ServiceConnectionCallback;
 
 import java.util.ArrayList;
 
@@ -78,7 +85,7 @@ public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter
 
         if (playerControlsFragment == null) {
             FragmentTransaction transaction = manager.beginTransaction();
-            playerControlsFragment = new PlayerControlsFragment(trackList, position);
+            playerControlsFragment = new PlayerControlsFragment(trackList, position, null);
             transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
             transaction.add(R.id.container, playerControlsFragment, PlayerControlsFragment.FRAGMENT_TAG);
             transaction.commit();

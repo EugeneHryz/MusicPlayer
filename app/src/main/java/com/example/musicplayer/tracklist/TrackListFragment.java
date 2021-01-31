@@ -72,7 +72,6 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
         @Override
         public void onBindViewHolder(@NonNull TrackViewHolder holder, int position) {
             View view = holder.getView();
-            Log.d(TAG, "onBind... " + position);
 
             MediaMetadataCompat metadata = presenter.getDataItem(position);
 
@@ -83,7 +82,7 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
 
             ImageView imageView = view.findViewById(R.id.track_album_cover);
             Glide.with(view.getContext()).load(Uri.parse(metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)))
-                    .placeholder(R.drawable.music_note_icon)
+                    .placeholder(R.drawable.music_note_icon_light)
                     .apply(new RequestOptions().centerCrop())
                     .into(imageView);
 
@@ -98,6 +97,19 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
                     optionsMenu.show();
                 }
             });
+
+            // recyclerview uses a finite number of views and recycles them
+            // so we need to stop the animation if the view is used for another item in the list
+            if (metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
+                    .equals(presenter.getCurrentMediaId())) {
+                if (presenter.isPlaying()) {
+                    toggleEqualizerAnimation(view, true, true);
+                } else {
+                    toggleEqualizerAnimation(view, false, true);
+                }
+            } else {
+                toggleEqualizerAnimation(view, false, false);
+            }
 
             view.setOnClickListener((v) -> {
                 presenter.play(position);
@@ -117,5 +129,48 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
             this.view = view;
         }
         public View getView() { return view; }
+    }
+
+    @Override
+    public void toggleEqualizerAnimation(View view, boolean resume, boolean visible) {
+        if (view != null) {
+            VuMeterView equalizerAnimation = view.findViewById(R.id.equalizer_animation);
+            if (equalizerAnimation != null) {
+                if (resume) {
+                    equalizerAnimation.resume(true);
+                } else {
+                    equalizerAnimation.pause();
+                }
+                if (!visible) {
+                    equalizerAnimation.setVisibility(View.GONE);
+                } else {
+                    equalizerAnimation.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void rebindItems() {
+        if (recyclerView != null && recyclerView.getAdapter() != null) {
+            recyclerView.getAdapter().notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "onStop");
+        super.onStop();
     }
 }

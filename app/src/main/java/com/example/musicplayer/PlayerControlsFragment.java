@@ -27,6 +27,8 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
@@ -43,6 +45,7 @@ public class PlayerControlsFragment extends Fragment {
     private int currentPosition;
 
     private ServiceConnection connection;
+    private ServiceConnectionCallback connectionCallback;
     private boolean serviceConnected = false;
 
     private MusicService.LocalBinder binder;
@@ -77,12 +80,14 @@ public class PlayerControlsFragment extends Fragment {
 
     private PlaybackStateCompat previousPlaybackState;
 
-    public PlayerControlsFragment(ArrayList<MediaMetadataCompat> tracksMetadata, int position) {
+    public PlayerControlsFragment(ArrayList<MediaMetadataCompat> tracksMetadata, int position,
+                                  ServiceConnectionCallback callback) {
         super();
 
         fragment = this;
         this.tracksMetadata = tracksMetadata;
         currentPosition = position;
+        connectionCallback = callback;
     }
 
     @Override
@@ -92,6 +97,10 @@ public class PlayerControlsFragment extends Fragment {
         connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
+                Log.d(TAG, "onServiceConnected");
+                if (connectionCallback != null) {
+                    connectionCallback.onServiceConnected(name, service);
+                }
                 serviceConnected = true;
                 binder = (MusicService.LocalBinder) service;
                 callback = binder.getMediaSessionCallback();
@@ -186,6 +195,7 @@ public class PlayerControlsFragment extends Fragment {
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
+                Log.d(TAG, "onServiceDisconnected");
                 serviceConnected = false;
             }
         };
@@ -268,6 +278,17 @@ public class PlayerControlsFragment extends Fragment {
                     seekBar.setEnabled(false);
                     minNextButton.setEnabled(true);
                     minTogglePauseButton.setEnabled(true);
+
+                } else if (i == R.id.gone) {
+                    Log.d(TAG, "onTransitionCompleted");
+                    getContext().unbindService(connection);
+
+                    FragmentManager manager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    transaction.remove(fragment).commit();
+                    if (connectionCallback != null) {
+                        connectionCallback.onUnbind();
+                    }
                 }
             }
 
@@ -360,6 +381,10 @@ public class PlayerControlsFragment extends Fragment {
 
     public void updateViewPager() {
         viewPager.setAdapter(new ImageSliderAdapter(getActivity()));
+    }
+
+    public MusicService.LocalBinder getBinder() {
+        return binder;
     }
 
     public ArrayList<MediaMetadataCompat> getTrackQueue() {

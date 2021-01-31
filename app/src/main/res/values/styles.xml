@@ -4,7 +4,8 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/musicplayer_light_gray</item>
         <item name="colorOnPrimary">@color/musicplayer_white</item>
-        <item name="colorPrimaryDark">@color/musicplayer_black</item>
+        <!--<item name="colorPrimaryDark">@color/musicplayer_black</item>-->
+        <item name="colorPrimaryDark">@color/musicplayer_dark_blue</item>
         <item name="android:colorBackground">@color/musicplayer_dark_gray</item>
         <item name="android:textColorSecondary">@color/musicplayer_white</item>
 
@@ -75,12 +76,24 @@
         <item name="android:textColor">@color/musicplayer_white</item>
     </style>
 
+    <style name="TextAppearance.MusicPlayer.TextRegular.Dark">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
     <style name="TextAppearance.MusicPlayer.TextSmall" parent="TextAppearance.MaterialComponents.Body2">
         <item name="android:textColor">@color/musicplayer_white</item>
     </style>
 
+    <style name="TextAppearance.MusicPlayer.TextSmall.Dark">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
     <style name="TextAppearance.MusicPlayer.TextTiny" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@color/musicplayer_white</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextTiny.Dark">
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
     <style name="TextAppearance.MusicPlayer.TextRegular.Bold">
@@ -90,7 +103,7 @@
     <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
         <item name="android:textColor">@color/musicplayer_white</item>
         <item name="android:textSize">@dimen/medium_text_size</item>
-        <item name="android:popupBackground">@color/musicplayer_black</item>
+        <item name="android:popupBackground">@color/musicplayer_dim_orange</item>
         <item name="android:colorBackground">@drawable/ripple_dark</item>
     </style>
 

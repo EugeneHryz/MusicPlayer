@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="musicplayer_light_gray">#3E3E50</color>
-    <color name="musicplayer_dark_gray">#27272f</color>
+    <color name="musicplayer_light_gray">#376595</color>
+    <color name="musicplayer_dark_gray">#ECEDF1</color>
     <color name="musicplayer_white">#FFFFFF</color>
     <color name="musicplayer_ripple_dark">#7C7D83</color>
     <color name="musicplayer_ripple_light">#B3B4BA</color>
-    <color name="musicplayer_black">#212127</color>
-    <color name="musicplayer_dirty_gray">#525257</color>
+    <color name="musicplayer_black">#376595</color>
+    <color name="musicplayer_item_divider_dark_gray">#525257</color>
+    <color name="musicplayer_item_divider_light_gray">#CCCEDD</color>
+    <color name="musicplayer_gray">#9699A6</color>
     <color name="musicplayer_red">#E64040</color>
     <color name="musicplayer_dark_blue">#333549</color>
     <color name="musicplayer_dim_white">#868AA6</color>
+
+    <color name="musicplayer_light_blue">#376595</color>
+    <color name="musicplayer_dim_orange">#AE573C</color>
+    <color name="musicplayer_brown">#4E3126</color>
+    <color name="musicplayer_not_completely_white">#ECEDF1</color>
 </resources>

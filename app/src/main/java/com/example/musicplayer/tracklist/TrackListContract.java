@@ -1,5 +1,6 @@
 package com.example.musicplayer.tracklist;
 
+import android.net.Uri;
 import android.support.v4.media.MediaMetadataCompat;
 import android.view.View;
 
@@ -13,10 +14,15 @@ public interface TrackListContract {
 
         void play(int position);
 
-        int getCurrentPlayingPosition();
+        String getCurrentMediaId();
+
+        boolean isPlaying();
     }
 
     interface View extends BaseView<TrackListPresenter> {
 
+        void toggleEqualizerAnimation(android.view.View view, boolean resume, boolean visible);
+
+        void rebindItems();
     }
 }

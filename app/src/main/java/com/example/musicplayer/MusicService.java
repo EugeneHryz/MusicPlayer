@@ -31,12 +31,13 @@ import androidx.core.app.TaskStackBuilder;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.view.KeyEvent;
 
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MusicService extends Service {
+public class MusicService extends Service implements AudioFocusChangedCallback {
     public static final String TAG = "MusicService";
 
     private MediaSessionCompat mediaSession;
@@ -63,7 +64,7 @@ public class MusicService extends Service {
     private static final String NOTIFICATION_CHANNEL_ID = "com.example.musicplayer";
     private static final String CHANNEL_NAME = "Background service";
 
-    public static final String ACTION = "ACTION";
+    public static final String LOAD_ACTION = "LOAD ACTIVITY";
     public static final String DELETE_ACTION = "DELETE_ACTION";
 
     public static final String ACTION_CMD = "ACTION_CMD";
@@ -91,7 +92,7 @@ public class MusicService extends Service {
             public void onCompletion(MediaPlayer mp) {
                 callback.onSkipToNext();
             }
-        });
+        }, this);
 
         stateBuilder = new PlaybackStateCompat.Builder();
         metadataBuilder = new MediaMetadataCompat.Builder();
@@ -201,6 +202,31 @@ public class MusicService extends Service {
                     mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_BUFFERING));
                     player.seekTo((int) pos);
                 }
+
+                @Override
+                public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+                    KeyEvent mediaEvent = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+
+                    if (mediaEvent.getAction() == KeyEvent.ACTION_UP) {
+                        int keyCode = mediaEvent.getKeyCode();
+                        switch (keyCode) {
+                            case KeyEvent.KEYCODE_MEDIA_NEXT:
+                                onSkipToNext();
+                                break;
+
+                            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                                onSkipToPrevious();
+                                break;
+
+                            case KeyEvent.KEYCODE_MEDIA_PLAY:
+
+                            case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                                onPause();
+                                break;
+                        }
+                    }
+                    return true;
+                }
             };
         }
 
@@ -215,10 +241,12 @@ public class MusicService extends Service {
         }
 
         Intent intent = new Intent(this, MainActivity.class);
-        intent.setAction(ACTION);
-        TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
+        intent.setAction(LOAD_ACTION);
+        /*TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
         taskStackBuilder.addNextIntentWithParentStack(intent);
-        contentIntent = taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        contentIntent = taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);*/
+        contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 
         Intent deleteIntent = new Intent(this,  MusicService.class);
         deleteIntent.setAction(DELETE_ACTION);
@@ -245,6 +273,16 @@ public class MusicService extends Service {
         return playbackState;
     }
 
+    @Override
+    public void onFocusGained() {
+        mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PLAYING));
+    }
+
+    @Override
+    public void onFocusLost() {
+        mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PAUSED));
+    }
+
     public class LocalBinder extends Binder {
         public MediaSessionCompat.Callback getMediaSessionCallback() {
             return callback;
@@ -254,8 +292,14 @@ public class MusicService extends Service {
         public int getCurrentPosition() { return player.getCurrentPosition(); }
         public void setTracksMetadata(ArrayList<MediaMetadataCompat> tracksQueue) { tracksMetadata = tracksQueue; }
 
-        public int getCurrentQueuePosition() { return currentQueueIndex; }
+        public int getCurrentQueuePosition() {
+            return currentQueueIndex;
+        }
         public ArrayList<MediaMetadataCompat> getTrackQueue() { return tracksMetadata; }
+        public MediaMetadataCompat getCurrentTrackMetadata() {
+
+            return tracksMetadata.get(currentQueueIndex);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -334,7 +378,6 @@ public class MusicService extends Service {
         }
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         builder.setContentIntent(contentIntent)
-                .setDeleteIntent(deleteIntent)
                 .setSmallIcon(togglePauseIcon)
                 .setLargeIcon(artwork)
                 .setContentTitle(title)
@@ -362,7 +405,6 @@ public class MusicService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind");
         return true;
     }
 
@@ -374,5 +416,6 @@ public class MusicService extends Service {
     @Override
     public void onDestroy() {
         callback.onStop();
+        unregisterReceiver(broadcastReceiver);
     }
 }

@@ -107,7 +107,7 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
 
             ImageView imageView = view.findViewById(R.id.album_cover);
             Glide.with(holder.getView().getContext()).load(album.getAlbumCoverUri())
-                    .placeholder(R.drawable.music_note_icon)
+                    .placeholder(R.drawable.music_note_icon_light)
                     .apply(new RequestOptions().centerCrop()).into(imageView);
 
             ImageButton albumOptionsButton = view.findViewById(R.id.album_options_button);

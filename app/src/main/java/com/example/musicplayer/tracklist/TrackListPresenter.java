@@ -2,11 +2,14 @@ package com.example.musicplayer.tracklist;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -17,11 +20,12 @@ import com.example.musicplayer.MusicDataProvider;
 import com.example.musicplayer.MusicService;
 import com.example.musicplayer.PlayerControlsFragment;
 import com.example.musicplayer.R;
+import com.example.musicplayer.ServiceConnectionCallback;
 
 import java.util.ArrayList;
 
 public class TrackListPresenter implements TrackListContract.Presenter,
-        MusicDataProvider.GetTrackListCallback {
+        MusicDataProvider.GetTrackListCallback, ServiceConnectionCallback {
 
     public static final String TAG = "TrackListPresenter";
 
@@ -34,9 +38,11 @@ public class TrackListPresenter implements TrackListContract.Presenter,
     private int bufferedPosition;
 
     private boolean isPlaying;
+    private boolean bound;
 
     private MusicService.LocalBinder binder;
     private MediaControllerCompat controller;
+    private MediaControllerCompat.Callback controllerCallback;
 
     public TrackListPresenter(DataProvider dataProvider, TrackListContract.View view, Context context) {
         this.dataProvider = dataProvider;
@@ -46,6 +52,24 @@ public class TrackListPresenter implements TrackListContract.Presenter,
         dataProvider.getTrackListAsynchronous(null, this);
 
         view.setPresenter(this);
+        controllerCallback = new MediaControllerCompat.Callback() {
+            @Override
+            public void onPlaybackStateChanged(PlaybackStateCompat state) {
+                if (state.getState() == PlaybackStateCompat.STATE_PAUSED) {
+                    isPlaying = false;
+                    view.rebindItems();
+                } else if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
+                    isPlaying = true;
+                    view.rebindItems();
+                }
+            }
+
+            @Override
+            public void onMetadataChanged(MediaMetadataCompat metadata) {
+                Log.d(TAG, "onMetadataChanged");
+                view.rebindItems();
+            }
+        };
     }
 
     @Override
@@ -84,7 +108,7 @@ public class TrackListPresenter implements TrackListContract.Presenter,
 
         if (playerControlsFragment == null) {
             FragmentTransaction transaction = manager.beginTransaction();
-            playerControlsFragment = new PlayerControlsFragment(trackList, position);
+            playerControlsFragment = new PlayerControlsFragment(trackList, position, this);
             transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
             transaction.add(R.id.container, playerControlsFragment, PlayerControlsFragment.FRAGMENT_TAG);
             transaction.commit();
@@ -105,10 +129,31 @@ public class TrackListPresenter implements TrackListContract.Presenter,
     }
 
     @Override
-    public int getCurrentPlayingPosition() {
+    public String getCurrentMediaId() {
         if (binder != null) {
-            return binder.getCurrentQueuePosition();
+            return binder.getCurrentTrackMetadata()
+                    .getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI);
         }
-        return -1;
+        return null;
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        binder = (MusicService.LocalBinder) service;
+        controller = binder.getMediaController();
+        bound = true;
+
+        controller.registerCallback(controllerCallback);
+    }
+
+    @Override
+    public void onUnbind() {
+        bound = false;
+        view.rebindItems();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return isPlaying;
     }
 }

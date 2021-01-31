@@ -15,57 +15,64 @@
 
         <TextView
             android:id="@+id/track_duration"
-            android:layout_width="266dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.MusicPlayer.TextTiny"
+            android:text="Track Duration"
+            android:layout_marginBottom="9dp"
+            android:textAppearance="@style/TextAppearance.MusicPlayer.TextTiny.Dark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/track_title"
-            app:layout_constraintTop_toBottomOf="@+id/track_title" />
+            app:layout_constraintTop_toBottomOf="@+id/track_title"
+            app:layout_constraintEnd_toEndOf="@+id/track_title"/>
 
         <TextView
             android:id="@+id/track_title"
-            android:layout_width="266dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.MusicPlayer.TextRegular"
+            android:text="Track Title"
+            android:layout_marginTop="9dp"
+            android:textAppearance="@style/TextAppearance.MusicPlayer.TextRegular.Dark"
             app:layout_constraintBottom_toTopOf="@+id/track_duration"
             app:layout_constraintStart_toEndOf="@+id/track_number"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/equalizer_animation"/>
 
         <TextView
             android:id="@+id/track_number"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
-            android:text="8"
+            android:text="0"
             android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.MusicPlayer.TextSmall"
+            android:textAppearance="@style/TextAppearance.MusicPlayer.TextSmall.Dark"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"/>
+
+        <include layout="@layout/equalizer_animation" />
 
         <ImageButton
-            android:id="@+id/album_track_options_button"
+            android:id="@+id/track_options_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_baseline_more_vert_24"
+            android:tint="@color/musicplayer_gray"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.55" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

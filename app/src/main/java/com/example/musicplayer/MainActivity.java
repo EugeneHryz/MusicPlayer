@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
+        Log.d(TAG, "onNewIntent");
         super.onNewIntent(intent);
 
         String action = intent.getAction();
@@ -90,13 +92,14 @@ public class MainActivity extends AppCompatActivity {
 
             if (fragment == null) {
                 FragmentTransaction transaction = manager.beginTransaction();
-                fragment = new PlayerControlsFragment(trackQueue, position);
+                fragment = new PlayerControlsFragment(trackQueue, position, null);
                 transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
                 transaction.replace(R.id.container, fragment, PlayerControlsFragment.FRAGMENT_TAG);
                 transaction.commit();
             } else {
                 MediaSessionCompat.Callback callback = fragment.getMediaSessionCallback();
                 fragment.setTrackQueue(trackQueue);
+                fragment.updateViewPager();
                 callback.onSkipToQueueItem(position);
             }
         }

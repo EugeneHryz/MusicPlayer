@@ -7,29 +7,32 @@ import android.net.Uri;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 public class DataProvider implements MusicDataProvider {
-
     public static final String TAG = "DataProvider";
 
     private Cursor cursor;
     private final Context context;
-    private final Executor executor;
+    private Executor executor;
     private Handler mainThreadHandler;
     private int itemCount = 0;
 
     private ArrayList<MediaMetadataCompat> trackList;
 
-    public DataProvider(Context context, Executor executor) {
+    public DataProvider(Context context) {
         this.context = context;
-        this.executor = executor;
 
         trackList = new ArrayList<MediaMetadataCompat>();
+    }
+
+    public DataProvider(Context context, Executor executor) {
+        this(context);
+
+        this.executor = executor;
     }
 
     public DataProvider(Context context, Executor executor, Handler mainThreadHandler) {
@@ -76,24 +79,26 @@ public class DataProvider implements MusicDataProvider {
     }
 
     public void getTrackListAsynchronous(Album album, MusicDataProvider.GetTrackListCallback trackListCallback) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                getTrackListSynchronous(album, trackListCallback);
-                if (mainThreadHandler != null) {
-                    mainThreadHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            trackListCallback.onTrackListLoaded(trackList);
-                        }
-                    });
+        if (executor != null) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    getTrackListSynchronous(album, null, trackListCallback);
+                    if (mainThreadHandler != null) {
+                        mainThreadHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                trackListCallback.onTrackListLoaded(trackList);
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
-    // can put options as a parameter to filter tracks
-    private ArrayList<MediaMetadataCompat> getTrackListSynchronous(Album album, MusicDataProvider.GetTrackListCallback trackListCallback) {
+    public ArrayList<MediaMetadataCompat> getTrackListSynchronous(Album album, String searchQuery,
+                                                                   MusicDataProvider.GetTrackListCallback trackListCallback) {
         if (cursor == null) {
             String[] projection = {MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
                     MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.DURATION};
@@ -103,20 +108,23 @@ public class DataProvider implements MusicDataProvider {
                 selection = MediaStore.Audio.Media.ALBUM + "=?";
                 selectionArgs = new String[] { album.getTitle() };
             }
+            if (searchQuery != null) {
+                selection = MediaStore.Audio.Media.TITLE + " LIKE ? OR " + MediaStore.Audio.Media.ARTIST + " LIKE ?";
+                selectionArgs = new String[] { "%" + searchQuery + "%", "%" + searchQuery + "%" };
+            }
             cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     projection, selection, selectionArgs, null);
-        } else {
-//            Log.d(TAG, )
         }
         if (mainThreadHandler != null) {
             mainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    trackListCallback.trackListLoadStarted();
+                    if (trackListCallback != null) {
+                        trackListCallback.trackListLoadStarted();
+                    }
                 }
             });
         }
-
         MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
 
         if (cursor != null) {
@@ -139,8 +147,10 @@ public class DataProvider implements MusicDataProvider {
 
                 Uri mediaUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
                 Uri albumCoverUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
-                if (albumTitle == null || albumTitle.isEmpty() || !checkIfContentUriExists(albumCoverUri)) {
-                    albumCoverUri = Uri.parse("android.resource://com.example.musicplayer/" + R.drawable.music_note_icon);
+                if (searchQuery == null) {
+                    if (albumTitle == null || albumTitle.isEmpty() || !checkIfContentUriExists(albumCoverUri)) {
+                        albumCoverUri = Uri.parse("android.resource://com.example.musicplayer/" + R.drawable.music_note_icon_light);
+                    }
                 }
 
                 trackList.add(metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)

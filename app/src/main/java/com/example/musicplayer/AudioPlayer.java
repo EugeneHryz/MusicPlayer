@@ -27,6 +27,8 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
     private MediaPlayer.OnSeekCompleteListener seekCompleteListener;
     private MediaPlayer.OnCompletionListener audioCompletedListener;
 
+    private AudioFocusChangedCallback audioFocusChangedCallback;
+
     private Uri currentAudioId;
 
     private boolean playBackDelayed = false;
@@ -34,7 +36,7 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
     private boolean resumeOnFocusGain = false;
 
     public AudioPlayer(Context context, MediaPlayer.OnSeekCompleteListener seekCompleteListener,
-                        MediaPlayer.OnCompletionListener audioCompletedListener) {
+                        MediaPlayer.OnCompletionListener audioCompletedListener, AudioFocusChangedCallback callback) {
         this.context = context;
 
         mediaPlayer = null;
@@ -42,6 +44,7 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
 
         this.seekCompleteListener = seekCompleteListener;
         this.audioCompletedListener = audioCompletedListener;
+        audioFocusChangedCallback = callback;
     }
 
     private void createMediaPlayer() {
@@ -161,6 +164,7 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
                         resumeOnFocusGain = false;
                     }
                     playbackNow();
+                    audioFocusChangedCallback.onFocusGained();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
@@ -169,6 +173,7 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
                     resumeOnFocusGain = false;
                 }
                 pausePlayback();
+                audioFocusChangedCallback.onFocusLost();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 synchronized (focusLock) {
@@ -176,6 +181,7 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
                     resumeOnFocusGain = true;
                 }
                 pausePlayback();
+                audioFocusChangedCallback.onFocusLost();
                 break;
         }
     }

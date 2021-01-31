@@ -7,14 +7,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -26,12 +24,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.musicplayer.Album;
@@ -43,18 +39,17 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
+import io.gresse.hugo.vumeterlibrary.VuMeterView;
 
 public class AlbumTrackListFragment extends Fragment implements AlbumTrackListContract.View {
     public static final String TAG = "AlbumTrackListFragment";
 
     private FloatingActionButton playAllButton;
-    private PlayerControlsFragment playerControlsFragment;
     private AlbumTrackListContract.Presenter presenter;
 
     private int trackListSize;
 
-    private int currentPlayingPosition = -1;
+    private RecyclerView recyclerView;
 
     public AlbumTrackListFragment(String transitionName) {
         super();
@@ -67,8 +62,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_album_track_list, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_album_track_list, container, false);
     }
 
     @Override
@@ -129,7 +123,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
                 imageView.setTransitionName(getArguments().getString("transition_name"));
             }
             Glide.with(view.getContext()).load(album.getAlbumCoverUri())
-                    .placeholder(R.drawable.music_note_icon)
+                    .placeholder(R.drawable.music_note_icon_light)
                     .into(new ImageViewTarget<Drawable>(imageView) {
                         @Override
                         protected void setResource(@Nullable Drawable resource) {
@@ -148,16 +142,6 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
                         }
                     });
 
-            /*ViewGroup parentView = (ViewGroup) view.getParent();
-            parentView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    parentView.getViewTreeObserver().removeOnPreDrawListener(this);
-
-                    return true;
-                }
-            });*/
-
             ((TextView)view.findViewById(R.id.album_title)).setText(album.getTitle());
             String albumArtist = album.getArtist() + " " + "\u2022";
             ((TextView)view.findViewById(R.id.album_artist_name)).setText(albumArtist);
@@ -169,7 +153,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
                     getString(R.string.tracks_text) : getString(R.string.track_text));
             ((TextView)view.findViewById(R.id.track_number)).setText(trackNumberText);
 
-            RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+            recyclerView = view.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
             recyclerView.setAdapter(new AlbumTrackRecyclerViewAdapter());
             recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext()));
@@ -211,8 +195,6 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             });
 
 
-        } else {
-            Log.d(TAG, "hELLLLL");
         }
     }
 
@@ -242,7 +224,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             int seconds = (int) ((metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION) % 60000) / 1000);
             ((TextView) view.findViewById(R.id.track_duration)).setText((Integer.toString(minutes) + ":" + String.format("%02d", seconds)));
 
-            ImageButton trackOptionsButton = view.findViewById(R.id.album_track_options_button);
+            ImageButton trackOptionsButton = view.findViewById(R.id.track_options_button);
             PopupMenu optionsMenu = new PopupMenu(getContext(), trackOptionsButton);
             optionsMenu.getMenuInflater().inflate(R.menu.track_popup_menu, optionsMenu.getMenu());
 
@@ -272,6 +254,4 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             public View getView() { return view; }
         }
     }
-
-
 }

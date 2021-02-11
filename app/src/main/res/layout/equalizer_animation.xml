@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.gresse.hugo.vumeterlibrary.VuMeterView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:vumeter="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/equalizer_animation"
+    android:layout_width="30dp"
+    android:layout_height="30dp"
+    android:layout_marginEnd="12dp"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toStartOf="@id/track_options_button"
+    vumeter:vumeter_blockNumber="3"
+    vumeter:vumeter_blockSpacing="2dp"
+    vumeter:vumeter_speed="6"
+    vumeter:vumeter_backgroundColor="@color/musicplayer_gray"
+    vumeter:vumeter_startOff="true"
+    vumeter:vumeter_stopSize="4dp"
+    android:visibility="gone">
+</io.gresse.hugo.vumeterlibrary.VuMeterView>

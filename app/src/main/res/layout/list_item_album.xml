@@ -4,10 +4,11 @@
     android:layout_width="@dimen/card_album_width"
     android:layout_height="@dimen/card_album_height"
     card_view:cardElevation="@dimen/card_elevation"
-    card_view:cardBackgroundColor="@color/musicplayer_light_gray"
+    card_view:cardBackgroundColor="@color/musicplayer_light_cherry"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="@drawable/ripple_light">
+    android:foreground="@drawable/ripple_light"
+    card_view:cardCornerRadius="12dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

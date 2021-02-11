@@ -1,15 +1,19 @@
 package com.example.musicplayer.albumlist;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.media.MediaMetadataCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.Transition;
 import androidx.transition.TransitionInflater;
 
 import com.example.musicplayer.Album;
 import com.example.musicplayer.DataProvider;
+import com.example.musicplayer.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
 import com.example.musicplayer.albumtracklist.AlbumTrackListFragment;
 import com.example.musicplayer.albumtracklist.AlbumTrackListPresenter;
@@ -67,5 +71,16 @@ public class AlbumListPresenter implements AlbumListContract.Presenter {
         transaction.replace(R.id.fragment_container, fragment, AlbumTrackListFragment.TAG);
         transaction.addSharedElement(view.findViewById(R.id.album_cover), transitionName);
         transaction.addToBackStack(null).commit();
+    }
+
+    @Override
+    public void showBottomDialogFragment(int position, Context context) {
+        DataProvider dataProvider = new DataProvider(context, executorService);
+        ArrayList<MediaMetadataCompat> trackList = dataProvider
+                .getTrackListSynchronous(albumList.get(position), null, null);
+        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList);
+
+        FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
+        fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
     }
 }

@@ -32,14 +32,13 @@ public class SearchableActivity extends ListActivity {
     public static final String QUEUE_KEY = "queue key";
     public static final String POSITION_KEY = "position key";
 
-    private DataProvider dataProvider;
     private ArrayList<MediaMetadataCompat> searchResults;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_results);
-        dataProvider = new DataProvider(getApplicationContext());
+        DataProvider dataProvider = new DataProvider(getApplicationContext());
 
         if (Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
             searchResults = dataProvider.getTrackListSynchronous(null,
@@ -114,19 +113,16 @@ public class SearchableActivity extends ListActivity {
                     .apply(new RequestOptions().centerCrop())
                     .into(albumCover);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.setAction(PLAY_ACTION);
+            view.setOnClickListener(v -> {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.setAction(PLAY_ACTION);
 
-                    Bundle args = new Bundle();
-                    args.putSerializable(QUEUE_KEY, searchResults);
-                    args.putInt(POSITION_KEY, position);
-                    intent.putExtras(args);
-                    startActivity(intent);
-                    onBackPressed();
-                }
+                Bundle args = new Bundle();
+                args.putSerializable(QUEUE_KEY, searchResults);
+                args.putInt(POSITION_KEY, position);
+                intent.putExtras(args);
+                startActivity(intent);
+                onBackPressed();
             });
             return view;
         }

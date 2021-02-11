@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -25,10 +26,7 @@ import androidx.transition.TransitionInflater;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.musicplayer.DividerItemDecoration;
-import com.example.musicplayer.PlayerControlsFragment;
 import com.example.musicplayer.R;
-
-import java.util.ArrayList;
 
 import io.gresse.hugo.vumeterlibrary.VuMeterView;
 
@@ -41,7 +39,7 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        recyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_album_list, container);
+        recyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_list, container);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(new TrackRecyclerViewAdapter());
@@ -90,12 +88,15 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
 
             PopupMenu optionsMenu = new PopupMenu(getContext(), trackOptionsButton);
             optionsMenu.getMenuInflater().inflate(R.menu.track_popup_menu, optionsMenu.getMenu());
-
-            trackOptionsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    optionsMenu.show();
+            trackOptionsButton.setOnClickListener(v -> optionsMenu.show());
+            optionsMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.add_track_to_playlist_action:
+                        presenter.showBottomDialogFragment(position);
+                        break;
                 }
+
+                return false;
             });
 
             // recyclerview uses a finite number of views and recycles them

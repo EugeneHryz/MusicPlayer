@@ -4,6 +4,7 @@
     <string name="settings">Settings</string>
     <string name="albums">Albums</string>
     <string name="tracks">Tracks</string>
+    <string name="playlists">Playlists</string>
     <string name="search">Search</string>
     <string name="track_text">track</string>
     <string name="tracks_text">tracks</string>
@@ -20,4 +21,5 @@
     <string name="shuffle_menu_option">Shuffle</string>
     <string name="delete_menu_option">Delete</string>
     <string name="add_to_playlist_menu_option">Add to playlist</string>
+    <string name="delete_from_playlist_menu_option">Delete from playlist</string>
 </resources>

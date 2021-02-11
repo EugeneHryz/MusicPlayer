@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class DataProvider implements MusicDataProvider {
     private Handler mainThreadHandler;
     private int itemCount = 0;
 
-    private ArrayList<MediaMetadataCompat> trackList;
+    private final ArrayList<MediaMetadataCompat> trackList;
 
     public DataProvider(Context context) {
         this.context = context;
@@ -99,22 +100,20 @@ public class DataProvider implements MusicDataProvider {
 
     public ArrayList<MediaMetadataCompat> getTrackListSynchronous(Album album, String searchQuery,
                                                                    MusicDataProvider.GetTrackListCallback trackListCallback) {
-        if (cursor == null) {
-            String[] projection = {MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
-                    MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.DURATION};
-            String selection = null;
-            String[] selectionArgs = null;
-            if (album != null) {
-                selection = MediaStore.Audio.Media.ALBUM + "=?";
-                selectionArgs = new String[] { album.getTitle() };
-            }
-            if (searchQuery != null) {
-                selection = MediaStore.Audio.Media.TITLE + " LIKE ? OR " + MediaStore.Audio.Media.ARTIST + " LIKE ?";
-                selectionArgs = new String[] { "%" + searchQuery + "%", "%" + searchQuery + "%" };
-            }
-            cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    projection, selection, selectionArgs, null);
+        String[] projection = {MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.DURATION};
+        String selection = null;
+        String[] selectionArgs = null;
+        if (album != null) {
+            selection = MediaStore.Audio.Media.ALBUM + "=?";
+            selectionArgs = new String[]{album.getTitle()};
         }
+        if (searchQuery != null) {
+            selection = MediaStore.Audio.Media.TITLE + " LIKE ? OR " + MediaStore.Audio.Media.ARTIST + " LIKE ?";
+            selectionArgs = new String[]{"%" + searchQuery + "%", "%" + searchQuery + "%"};
+        }
+        cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection, selection, selectionArgs, null);
         if (mainThreadHandler != null) {
             mainThreadHandler.post(new Runnable() {
                 @Override
@@ -158,6 +157,7 @@ public class DataProvider implements MusicDataProvider {
                         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, albumTitle)
                         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, albumCoverUri.toString())
                         .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, mediaUri.toString())
+                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, Long.toString(id))
                         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
                         .build());
         }

@@ -2,14 +2,12 @@ package com.example.musicplayer.tracklist;
 
 import android.content.ComponentName;
 import android.content.Context;
-import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -19,6 +17,7 @@ import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.MusicDataProvider;
 import com.example.musicplayer.MusicService;
 import com.example.musicplayer.PlayerControlsFragment;
+import com.example.musicplayer.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
 import com.example.musicplayer.ServiceConnectionCallback;
 
@@ -155,5 +154,17 @@ public class TrackListPresenter implements TrackListContract.Presenter,
     @Override
     public boolean isPlaying() {
         return isPlaying;
+    }
+
+    @Override
+    public void showBottomDialogFragment(int position) {
+        ArrayList<MediaMetadataCompat> trackList = new ArrayList<>();
+        if (this.trackList != null) {
+            trackList.add(this.trackList.get(position));
+        }
+
+        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList);
+        FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
+        fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
     }
 }

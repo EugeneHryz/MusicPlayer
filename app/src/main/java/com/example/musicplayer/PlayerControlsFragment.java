@@ -200,38 +200,30 @@ public class PlayerControlsFragment extends Fragment {
             }
         };
 
-        updateSeekBarThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                threadIsRunning = true;
+        updateSeekBarThread = new Thread(() -> {
+            threadIsRunning = true;
 
-                while (threadIsRunning) {
-                    if (binder.isPlaying() && !seekByUser) {
-                        int position = binder.getCurrentPosition();
-                        seekBar.setProgress(position);
-                        String finalElapsed = convertMsToString(position);
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    elapsedTime.setText(finalElapsed);
-                                }
-                            });
-                        }
+            while (threadIsRunning) {
+                if (binder.isPlaying() && !seekByUser) {
+                    int position = binder.getCurrentPosition();
+                    seekBar.setProgress(position);
+                    String finalElapsed = convertMsToString(position);
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> elapsedTime.setText(finalElapsed));
                     }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        threadIsRunning = false;
-                        e.printStackTrace();
-                    }
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    threadIsRunning = false;
+                    e.printStackTrace();
                 }
             }
         });
     }
 
     private String convertMsToString(int ms) {
-        String elapsed = Integer.toString(ms / 60000) + ":";
+        String elapsed = ms / 60000 + ":";
         int seconds = (ms % 60000) / 1000;
         if (seconds < 10)
             elapsed += "0";
@@ -242,8 +234,7 @@ public class PlayerControlsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.from(getContext()).inflate(R.layout.music_player_motion, container, false);
-        return view;
+        return inflater.inflate(R.layout.music_player_motion, container, false);
     }
 
     @Override
@@ -356,15 +347,12 @@ public class PlayerControlsFragment extends Fragment {
 
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK && !collapsed) {
-                    playerControlsLayout.transitionToStart();
-                    return true;
-                }
-                return false;
+        getView().setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && !collapsed) {
+                playerControlsLayout.transitionToStart();
+                return true;
             }
+            return false;
         });
     }
 
@@ -381,10 +369,6 @@ public class PlayerControlsFragment extends Fragment {
 
     public void updateViewPager() {
         viewPager.setAdapter(new ImageSliderAdapter(getActivity()));
-    }
-
-    public MusicService.LocalBinder getBinder() {
-        return binder;
     }
 
     public ArrayList<MediaMetadataCompat> getTrackQueue() {

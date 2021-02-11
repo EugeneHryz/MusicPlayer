@@ -17,4 +17,10 @@
     <color name="musicplayer_dim_orange">#AE573C</color>
     <color name="musicplayer_brown">#4E3126</color>
     <color name="musicplayer_not_completely_white">#ECEDF1</color>
+
+    <color name="musicplayer_purple">#5C3051</color>
+    <color name="musicplayer_light_cherry">#A85F74</color>
+    <color name="musicplayer_pink">#a8665f</color>
+    <!--#8e344d-->
+    <!--#764d6b-->
 </resources>

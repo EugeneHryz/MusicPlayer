@@ -83,16 +83,8 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
     @Override
     public void onCreate() {
         super.onCreate();
-        player = new AudioPlayer(this, new MediaPlayer.OnSeekCompleteListener() {
-            @Override
-            public void onSeekComplete(MediaPlayer mp) {
-            }
-        }, new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                callback.onSkipToNext();
-            }
-        }, this);
+        player = new AudioPlayer(this, mp -> {
+        }, mp -> callback.onSkipToNext(), this);
 
         stateBuilder = new PlaybackStateCompat.Builder();
         metadataBuilder = new MediaMetadataCompat.Builder();
@@ -182,7 +174,6 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
                 @Override
                 public void onStop() {
-                    Log.d(TAG, "Stopping media session");
                     mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_STOPPED));
                     mediaSession.setActive(false);
                     player.releaseMediaPlayer();
@@ -242,11 +233,7 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.setAction(LOAD_ACTION);
-        /*TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
-        taskStackBuilder.addNextIntentWithParentStack(intent);
-        contentIntent = taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);*/
         contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
 
         Intent deleteIntent = new Intent(this,  MusicService.class);
         deleteIntent.setAction(DELETE_ACTION);
@@ -262,9 +249,6 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getAction().equals(DELETE_ACTION)) {
-            Log.d(TAG, "onStartCommand");
-        }
         return super.onStartCommand(intent, flags, startId);
     }
 

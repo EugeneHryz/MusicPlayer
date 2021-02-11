@@ -52,7 +52,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="74dp"
-                android:background="@color/musicplayer_light_gray"
+                android:background="@color/musicplayer_light_cherry"
                 android:elevation="10dp">
 
                 <TextView
@@ -85,12 +85,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginLeft="4dp"
-                    android:text="Track Number"
                     android:textAppearance="@style/TextAppearance.MusicPlayer.TextTiny"
                     app:layout_constraintBaseline_toBaselineOf="@+id/album_artist_name"
                     app:layout_constraintStart_toEndOf="@+id/album_artist_name" />
 
-                <ImageButton
+                <!--<ImageButton
                     android:id="@+id/imageButton"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
@@ -99,7 +98,7 @@
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_baseline_more_vert_24"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent" />-->
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!--need to be fixed-->
@@ -117,7 +116,7 @@
         android:id="@+id/play_all_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="18dp"
+        android:layout_margin="12dp"
         android:clickable="true"
         android:src="@drawable/ic_round_play_arrow_32"
         app:maxImageSize="32dp"

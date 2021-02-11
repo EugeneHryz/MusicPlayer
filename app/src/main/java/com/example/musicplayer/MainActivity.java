@@ -1,18 +1,24 @@
 package com.example.musicplayer;
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.os.HandlerCompat;
@@ -21,6 +27,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.musicplayer.albumtracklist.AlbumTrackListFragment;
+import com.example.musicplayer.playlisttracklist.PlaylistTrackListFragment;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -30,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE = 1;
     private static final String TAG = "MainActivity1";
-    public static final String defaultSongCollectionTilte = "Download";
+    public static final String defaultSongCollectionTitle = "Download";
     private Fragment mainFragment;
 
     private ExecutorService executorService;
@@ -107,7 +114,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().findFragmentByTag(AlbumTrackListFragment.TAG) == null) {
+        if (getSupportFragmentManager().findFragmentByTag(AlbumTrackListFragment.TAG) == null &&
+                getSupportFragmentManager().findFragmentByTag(PlaylistTrackListFragment.TAG) == null) {
             if (backPressedElapsedTime + 2000 > System.currentTimeMillis()) {
                 super.onBackPressed();
                 return;
@@ -118,5 +126,20 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        /*if (resultCode < 0) {
+            FragmentManager manager = getSupportFragmentManager();
+
+            PlaylistsBottomSheetFragment fragment = (PlaylistsBottomSheetFragment)
+                    manager.findFragmentByTag(PlaylistsBottomSheetFragment.TAG);
+            if (fragment != null) {
+                fragment.addTrackToPlaylists(requestCode);
+            }
+        }*/
     }
 }

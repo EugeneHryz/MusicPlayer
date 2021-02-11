@@ -16,18 +16,17 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
         AudioManager.OnAudioFocusChangeListener {
 
     private final static String TAG = "AudioPlayer";
-    private Context context;
+    private final Context context;
     private MediaPlayer mediaPlayer;
 
-    private AudioManager audioManager;
+    private final AudioManager audioManager;
     private AudioAttributes playbackAttributes;
-    private AudioFocusRequest focusRequest;
     private final Object focusLock = new Object();
 
-    private MediaPlayer.OnSeekCompleteListener seekCompleteListener;
-    private MediaPlayer.OnCompletionListener audioCompletedListener;
+    private final MediaPlayer.OnSeekCompleteListener seekCompleteListener;
+    private final MediaPlayer.OnCompletionListener audioCompletedListener;
 
-    private AudioFocusChangedCallback audioFocusChangedCallback;
+    private final AudioFocusChangedCallback audioFocusChangedCallback;
 
     private Uri currentAudioId;
 
@@ -80,7 +79,7 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                         .setAudioAttributes(playbackAttributes)
                         .setAcceptsDelayedFocusGain(true)
                         .setOnAudioFocusChangeListener(this)

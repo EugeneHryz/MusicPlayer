@@ -2,14 +2,9 @@ package com.example.musicplayer;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
-import android.support.v4.media.MediaMetadataCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.os.HandlerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -30,6 +24,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.musicplayer.albumlist.AlbumListFragment;
 import com.example.musicplayer.albumlist.AlbumListPresenter;
+import com.example.musicplayer.playlistlist.PlaylistListPresenter;
+import com.example.musicplayer.playlistlist.PlaylistListFragment;
 import com.example.musicplayer.tracklist.TrackListFragment;
 import com.example.musicplayer.tracklist.TrackListPresenter;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -37,16 +33,14 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 public class TabViewFragment extends Fragment {
 
     private static final String TAG = "TabViewFragment";
-    private ExecutorService executorService;
-    private Handler mainThreadHandler;
+    private final ExecutorService executorService;
+    private final Handler mainThreadHandler;
 
     public TabViewFragment(ExecutorService executorService, Handler mainThreadHandler) {
         this.executorService = executorService;
@@ -78,7 +72,8 @@ public class TabViewFragment extends Fragment {
 
     private String getTabText(int position) {
         if (position == 0) return getString(R.string.albums);
-        return getString(R.string.tracks);
+        if (position == 1) return getString(R.string.tracks);
+        return getString(R.string.playlists);
     }
 
     private int getTabIconId(int position) {
@@ -124,8 +119,6 @@ public class TabViewFragment extends Fragment {
                 searchView.onActionViewCollapsed();
             }
         });
-
-        Log.d(TAG, "In onCreateOptionsMenu");
     }
 
     private void setupViewPager(ViewPager2 viewPager) {
@@ -140,6 +133,12 @@ public class TabViewFragment extends Fragment {
         TrackListPresenter trackListPresenter = new TrackListPresenter(new DataProvider(getContext(),
                 executorService, mainThreadHandler), trackListFragment, getContext());
         pagerAdapter.addFragment(trackListFragment);
+
+        PlaylistListFragment playlistsFragment = new PlaylistListFragment();
+        PlaylistListPresenter playlistPresenter = new PlaylistListPresenter(new PlaylistDataProvider(getContext()),
+                playlistsFragment, executorService, mainThreadHandler);
+
+        pagerAdapter.addFragment(playlistsFragment);
         viewPager.setAdapter(pagerAdapter);
     }
 

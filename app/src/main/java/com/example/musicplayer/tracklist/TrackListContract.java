@@ -1,12 +1,9 @@
 package com.example.musicplayer.tracklist;
 
-import android.net.Uri;
 import android.support.v4.media.MediaMetadataCompat;
-import android.view.View;
 
 import com.example.musicplayer.BasePresenter;
 import com.example.musicplayer.BaseView;
-import com.example.musicplayer.Track;
 
 public interface TrackListContract {
 
@@ -17,6 +14,8 @@ public interface TrackListContract {
         String getCurrentMediaId();
 
         boolean isPlaying();
+
+        void showBottomDialogFragment(int position);
     }
 
     interface View extends BaseView<TrackListPresenter> {

@@ -18,13 +18,18 @@ import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.MusicDataProvider;
 import com.example.musicplayer.MusicService;
 import com.example.musicplayer.PlayerControlsFragment;
+import com.example.musicplayer.Playlist;
+import com.example.musicplayer.PlaylistDataProvider;
+import com.example.musicplayer.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
 import com.example.musicplayer.ServiceConnectionCallback;
+import com.example.musicplayer.playlisttracklist.PlaylistTrackListContract;
 
 import java.util.ArrayList;
 
 public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter,
         MusicDataProvider.GetTrackListCallback {
+
     public static final String TAG = "AlbumTrackListPresenter";
 
     private Context context;
@@ -37,7 +42,8 @@ public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter
 
     private AlbumTrackListContract.View view;
 
-    public AlbumTrackListPresenter(DataProvider dataProvider, AlbumTrackListContract.View view, Album album, Context context) {
+    public AlbumTrackListPresenter(DataProvider dataProvider, AlbumTrackListContract.View view,
+                                      Album album, Context context) {
         this.dataProvider = dataProvider;
         this.context = context;
         this.album = album;
@@ -108,5 +114,17 @@ public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter
     @Override
     public Album getAlbum() {
         return album;
+    }
+
+    @Override
+    public void showBottomDialogFragment(int position) {
+        ArrayList<MediaMetadataCompat> trackList = new ArrayList<>();
+        if (this.trackList != null) {
+            trackList.add(this.trackList.get(position));
+        }
+
+        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList);
+        FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
+        fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
     }
 }

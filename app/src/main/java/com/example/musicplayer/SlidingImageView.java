@@ -13,7 +13,7 @@ import androidx.viewpager2.widget.ViewPager2;
 public class SlidingImageView extends androidx.appcompat.widget.AppCompatImageView {
     public static final String TAG = "SlidingImageView";
 
-    private GestureDetector gestureDetector;
+    private final GestureDetector gestureDetector;
 
     private ViewPager2 viewPager;
     private PlayerScreenMotionLayout motionLayout;

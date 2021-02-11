@@ -18,10 +18,10 @@ public class SlidingImageFragment extends Fragment {
     public static final String TAG = "SlidingImageFragment";
 
     private SlidingImageView albumCover;
-    private ViewPager2 viewPager;
-    private PlayerScreenMotionLayout motionLayout;
+    private final ViewPager2 viewPager;
+    private final PlayerScreenMotionLayout motionLayout;
 
-    private Uri albumCoverUri;
+    private final Uri albumCoverUri;
 
     public SlidingImageFragment(ViewPager2 viewPager, PlayerScreenMotionLayout motionLayout, Uri albumCoverUri) {
         super();

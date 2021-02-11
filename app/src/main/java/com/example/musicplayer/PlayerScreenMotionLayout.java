@@ -15,10 +15,9 @@ import com.example.musicplayer.R;
 
 public class PlayerScreenMotionLayout extends MotionLayout {
 
-    private GestureDetector gestureDetector;
-    private View viewToDetectTouch;
+    private final GestureDetector gestureDetector;
     private boolean touchHasStarted = false;
-    private Rect viewRect = new Rect();
+    private final Rect viewRect = new Rect();
 
     public PlayerScreenMotionLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -34,7 +33,7 @@ public class PlayerScreenMotionLayout extends MotionLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        viewToDetectTouch = this.findViewById(R.id.player_background_view);
+        View viewToDetectTouch = this.findViewById(R.id.player_background_view);
         gestureDetector.onTouchEvent(event);
         if (event.getActionMasked() == MotionEvent.ACTION_UP ||
                 event.getActionMasked() == MotionEvent.ACTION_CANCEL) {

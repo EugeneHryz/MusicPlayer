@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -39,17 +40,16 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Locale;
+
 import io.gresse.hugo.vumeterlibrary.VuMeterView;
 
 public class AlbumTrackListFragment extends Fragment implements AlbumTrackListContract.View {
     public static final String TAG = "AlbumTrackListFragment";
 
-    private FloatingActionButton playAllButton;
     private AlbumTrackListContract.Presenter presenter;
 
     private int trackListSize;
-
-    private RecyclerView recyclerView;
 
     public AlbumTrackListFragment(String transitionName) {
         super();
@@ -98,12 +98,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             }
         });
         ImageView closeButton = searchView.findViewById(R.id.search_close_btn);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.onActionViewCollapsed();
-            }
-        });
+        closeButton.setOnClickListener(v -> searchView.onActionViewCollapsed());
     }
 
     @Override
@@ -146,20 +141,19 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             String albumArtist = album.getArtist() + " " + "\u2022";
             ((TextView)view.findViewById(R.id.album_artist_name)).setText(albumArtist);
 
-            Log.d(TAG, "Data item count: " + Integer.toString(presenter.getDataItemCount()));
             trackListSize = presenter.getDataItemCount();
 
             String trackNumberText = presenter.getDataItemCount() + " " + (presenter.getDataItemCount() > 1 ?
                     getString(R.string.tracks_text) : getString(R.string.track_text));
             ((TextView)view.findViewById(R.id.track_number)).setText(trackNumberText);
 
-            recyclerView = view.findViewById(R.id.recycler_view);
+            RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
             recyclerView.setAdapter(new AlbumTrackRecyclerViewAdapter());
             recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext()));
             recyclerView.setHasFixedSize(true);
 
-            MaterialToolbar toolbar = (MaterialToolbar) view.findViewById(R.id.album_tracklist_toolbar);
+            MaterialToolbar toolbar = view.findViewById(R.id.album_tracklist_toolbar);
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
             setHasOptionsMenu(true);
@@ -175,34 +169,14 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
                 imageView.setAlpha(value);
             });
 
-            playAllButton = view.findViewById(R.id.play_all_button);
+            FloatingActionButton playAllButton = view.findViewById(R.id.play_all_button);
             playAllButton.setOnClickListener((v) -> {
-//            FragmentManager manager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
 
-            /*playerControlsFragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
-            if (playerControlsFragment == null) {
-                FragmentTransaction transaction = manager.beginTransaction();
-                playerControlsFragment = new PlayerControlsFragment(albumTrackList, 0);
-                transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
-                transaction.replace(R.id.container, playerControlsFragment, PlayerControlsFragment.FRAGMENT_TAG);
-                transaction.commit();
-            } else {
-                MediaSessionCompat.Callback callback = playerControlsFragment.getMediaSessionCallback();
-
-                playerControlsFragment.setSongQueue(albumTrackList);
-                callback.onSkipToQueueItem(0);
-            }*/
             });
-
-
         }
     }
 
     private class AlbumTrackRecyclerViewAdapter extends RecyclerView.Adapter<AlbumTrackRecyclerViewAdapter.ViewHolder> {
-
-        public AlbumTrackRecyclerViewAdapter() {
-            super();
-        }
 
         @NonNull
         @Override
@@ -217,22 +191,28 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
 
             MediaMetadataCompat metadata = presenter.getDataItem(position);
 
-            ((TextView) view.findViewById(R.id.track_number)).setText(String.format("%2d", position + 1));
-            TextView trackTitle = ((TextView) view.findViewById(R.id.track_title));
+            ((TextView) view.findViewById(R.id.track_number))
+                    .setText(String.format(Locale.getDefault(), "%2d", position + 1));
+            TextView trackTitle = view.findViewById(R.id.track_title);
             trackTitle.setText(metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
             int minutes = (int) (metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION) / 60000);
             int seconds = (int) ((metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION) % 60000) / 1000);
-            ((TextView) view.findViewById(R.id.track_duration)).setText((Integer.toString(minutes) + ":" + String.format("%02d", seconds)));
+            ((TextView) view.findViewById(R.id.track_duration))
+                    .setText((minutes + ":" + String.format(Locale.getDefault(), "%02d", seconds)));
 
             ImageButton trackOptionsButton = view.findViewById(R.id.track_options_button);
             PopupMenu optionsMenu = new PopupMenu(getContext(), trackOptionsButton);
             optionsMenu.getMenuInflater().inflate(R.menu.track_popup_menu, optionsMenu.getMenu());
 
-            trackOptionsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    optionsMenu.show();
+            trackOptionsButton.setOnClickListener(v -> optionsMenu.show());
+            optionsMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.add_track_to_playlist_action:
+                        presenter.showBottomDialogFragment(position);
+                        break;
                 }
+
+                return false;
             });
 
             view.setOnClickListener((v) -> {

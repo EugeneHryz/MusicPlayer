@@ -10,7 +10,7 @@
         android:id="@+id/player_background_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardBackgroundColor="@color/musicplayer_dim_orange"
+        app:cardBackgroundColor="@color/musicplayer_pink"
         app:cardElevation="@dimen/standard_elevation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -142,8 +142,8 @@
         android:layout_marginLeft="20dp"
         app:layout_constraintTop_toBottomOf="@+id/artist_name"
         android:enabled="false"
-        android:thumbTint="@color/musicplayer_brown"
-        android:progressTint="@color/musicplayer_brown"/>
+        android:thumbTint="@android:color/black"
+        android:progressTint="@android:color/black"/>
 
     <TextView
         android:id="@+id/elapsed_time"

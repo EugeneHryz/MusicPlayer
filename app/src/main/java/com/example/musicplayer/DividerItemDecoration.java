@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.musicplayer.R;
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
-    private Drawable divider;
+    private final Drawable divider;
     private static final int SIDE_PADDING = 30;
 
     public DividerItemDecoration(Context context) {
@@ -21,7 +21,6 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void onDrawOver(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        int left = SIDE_PADDING;
         int right = parent.getWidth() - SIDE_PADDING;
 
         int childCount = parent.getChildCount();
@@ -30,7 +29,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
             int top = child.getBottom();
             int bottom = top + divider.getIntrinsicHeight();
-            divider.setBounds(left, top, right, bottom);
+            divider.setBounds(SIDE_PADDING, top, right, bottom);
             divider.draw(c);
         }
     }

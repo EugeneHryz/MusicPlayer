@@ -13,6 +13,8 @@ public interface AlbumTrackListContract {
         void play(int position);
 
         Album getAlbum();
+
+        void showBottomDialogFragment(int position);
     }
 
     interface View extends BaseView<AlbumTrackListPresenter> {

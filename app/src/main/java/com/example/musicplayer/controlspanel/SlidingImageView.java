@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.controlspanel;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,6 +9,9 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.example.musicplayer.Direction;
+import com.example.musicplayer.controlspanel.PlayerScreenMotionLayout;
 
 public class SlidingImageView extends androidx.appcompat.widget.AppCompatImageView {
     public static final String TAG = "SlidingImageView";
@@ -25,7 +28,6 @@ public class SlidingImageView extends androidx.appcompat.widget.AppCompatImageVi
     }
 
     public class DragGestureListener extends GestureDetector.SimpleOnGestureListener {
-
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             Direction dir = getDirection(e1.getX(), e1.getY(), e2.getX(), e2.getY());
@@ -48,9 +50,8 @@ public class SlidingImageView extends androidx.appcompat.widget.AppCompatImageVi
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         gestureDetector.onTouchEvent(event);
-        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+        if (event.getActionMasked() == MotionEvent.ACTION_UP && viewPager != null) {
             viewPager.setUserInputEnabled(true);
         }
         motionLayout.onTouchEvent(event);

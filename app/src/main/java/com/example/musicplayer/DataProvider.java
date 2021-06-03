@@ -27,7 +27,7 @@ public class DataProvider implements MusicDataProvider {
     public DataProvider(Context context) {
         this.context = context;
 
-        trackList = new ArrayList<MediaMetadataCompat>();
+        trackList = new ArrayList<>();
     }
 
     public DataProvider(Context context, Executor executor) {
@@ -81,18 +81,10 @@ public class DataProvider implements MusicDataProvider {
 
     public void getTrackListAsynchronous(Album album, MusicDataProvider.GetTrackListCallback trackListCallback) {
         if (executor != null) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    getTrackListSynchronous(album, null, trackListCallback);
-                    if (mainThreadHandler != null) {
-                        mainThreadHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                trackListCallback.onTrackListLoaded(trackList);
-                            }
-                        });
-                    }
+            executor.execute(() -> {
+                getTrackListSynchronous(album, null, trackListCallback);
+                if (mainThreadHandler != null) {
+                    mainThreadHandler.post(() -> trackListCallback.onTrackListLoaded(trackList));
                 }
             });
         }

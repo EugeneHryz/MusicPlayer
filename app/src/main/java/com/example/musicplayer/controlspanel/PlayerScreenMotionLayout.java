@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.controlspanel;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -13,6 +13,7 @@ import androidx.constraintlayout.motion.widget.MotionLayout;
 
 import com.example.musicplayer.R;
 
+
 public class PlayerScreenMotionLayout extends MotionLayout {
 
     private final GestureDetector gestureDetector;
@@ -24,7 +25,7 @@ public class PlayerScreenMotionLayout extends MotionLayout {
 
         gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
+            public boolean onSingleTapUp(MotionEvent e) {
                 transitionToEnd();
                 return false;
             }

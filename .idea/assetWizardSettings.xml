@@ -33,9 +33,10 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_round_pause_24" />
-                            <entry key="sourceFile" value="C:\AndroidStudioProjects\MusicPlayer" />
+                            <entry key="outputName" value="ic_music_note" />
+                            <entry key="sourceFile" value="C:\labs archive\tritpo labs\PS files\Musical Notes-595b40b85ba036ed117da66f.svg" />
                           </map>
                         </option>
                       </PersistentState>

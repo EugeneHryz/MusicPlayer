@@ -7,11 +7,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -33,7 +31,7 @@ import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.musicplayer.Album;
 import com.example.musicplayer.DividerItemDecoration;
-import com.example.musicplayer.PlayerControlsFragment;
+import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.R;
 import com.example.musicplayer.SearchableActivity;
 import com.google.android.material.appbar.AppBarLayout;
@@ -41,8 +39,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Locale;
-
-import io.gresse.hugo.vumeterlibrary.VuMeterView;
 
 public class AlbumTrackListFragment extends Fragment implements AlbumTrackListContract.View {
     public static final String TAG = "AlbumTrackListFragment";

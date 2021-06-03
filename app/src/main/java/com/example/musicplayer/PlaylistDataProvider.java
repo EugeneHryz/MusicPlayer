@@ -1,11 +1,9 @@
 package com.example.musicplayer;
 
-import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentSender;
 import android.database.Cursor;
 import android.net.Uri;
@@ -13,28 +11,31 @@ import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
+import android.util.Pair;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 public class PlaylistDataProvider implements MusicDataProvider {
     private static final String TAG = "PlaylistDataProvider";
+
     private final Context context;
 
     private Executor executor;
     private Handler mainThreadHandler;
     private int itemCount = 0;
 
-    private ArrayList<MediaMetadataCompat> trackList;
+    private final ArrayList<MediaMetadataCompat> trackList;
+
+    private final AppContainer container;
 
     public PlaylistDataProvider(Context context) {
         this.context = context;
 
         trackList = new ArrayList<>();
+        container = ((MusicPlayerApp) context.getApplicationContext()).appContainer;
     }
 
     public PlaylistDataProvider(Context context, Executor executor) {
@@ -57,6 +58,7 @@ public class PlaylistDataProvider implements MusicDataProvider {
 
     public Cursor queryAllPlaylists() {
         String[] projection = { MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.NAME };
+
         return context.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                 projection, null, null, null);
     }
@@ -64,31 +66,28 @@ public class PlaylistDataProvider implements MusicDataProvider {
     public Cursor queryTracksFromPlaylist(long playlistId) {
         String[] projection = { MediaStore.Audio.Playlists.Members.AUDIO_ID, MediaStore.Audio.Playlists.Members.PLAY_ORDER };
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
+
         return context.getContentResolver().query(uri, projection, null, null, null);
     }
 
-    public void addTrackToPlaylist(long playlistId, MediaMetadataCompat metadata, int playOrder, int requestCode) {
+    public void addTrackToPlaylist(long playlistId, ContentValues values, int requestCode) {
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
-        ContentValues values = new ContentValues();
-
-        values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID,
-                Long.parseLong(metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)));
-        values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, playOrder);
 
         try {
             context.getContentResolver().insert(uri, values);
         } catch (SecurityException e) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                RecoverableSecurityException recoverableSecurityException;
-                if (e instanceof RecoverableSecurityException) {
-                    recoverableSecurityException = (RecoverableSecurityException)e;
+                RecoverableSecurityException rse;
 
-                    IntentSender intentSender = recoverableSecurityException.getUserAction()
-                            .getActionIntent().getIntentSender();
+                if (e instanceof RecoverableSecurityException) {
+
+                    rse = (RecoverableSecurityException)e;
+                    IntentSender intentSender = rse.getUserAction().getActionIntent()
+                            .getIntentSender();
                     try {
-                        ((AppCompatActivity)context).startIntentSenderForResult(intentSender, requestCode, null,
-                                0, 0, 0);
+                        ((AppCompatActivity) context).startIntentSenderForResult(intentSender, requestCode,
+                                null, 0, 0, 0);
                     } catch (IntentSender.SendIntentException exception) {
                         exception.printStackTrace();
                     }
@@ -100,6 +99,7 @@ public class PlaylistDataProvider implements MusicDataProvider {
     public int deletePlaylist(long playlistId) {
         String selection = MediaStore.Audio.Playlists._ID + "=?";
         String[] selectionArgs = { Long.toString(playlistId) };
+
         return context.getContentResolver().delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                 selection, selectionArgs);
     }
@@ -108,6 +108,7 @@ public class PlaylistDataProvider implements MusicDataProvider {
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
         String selection = MediaStore.Audio.Playlists.Members._ID + "=?";
         String[] selectionArgs = { Long.toString(trackId) };
+
         return context.getContentResolver().delete(uri, selection, selectionArgs);
     }
 
@@ -123,19 +124,18 @@ public class PlaylistDataProvider implements MusicDataProvider {
     }
 
     public ArrayList<MediaMetadataCompat> getTrackListSynchronous(Playlist playlist, MusicDataProvider.GetTrackListCallback trackListCallback) {
+
         String[] projection = {MediaStore.Audio.Playlists.Members.TITLE, MediaStore.Audio.Playlists.Members.ARTIST,
                 MediaStore.Audio.Playlists.Members.ALBUM, MediaStore.Audio.Playlists.Members._ID,
                 MediaStore.Audio.Playlists.Members.ALBUM_ID, MediaStore.Audio.Playlists.Members.DURATION};
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlist.getId());
         Cursor cursor = context.getContentResolver().query(uri,
                 projection, null, null, null);
+
         if (mainThreadHandler != null) {
-            mainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (trackListCallback != null) {
-                        trackListCallback.trackListLoadStarted();
-                    }
+            mainThreadHandler.post(() -> {
+                if (trackListCallback != null) {
+                    trackListCallback.trackListLoadStarted();
                 }
             });
         }

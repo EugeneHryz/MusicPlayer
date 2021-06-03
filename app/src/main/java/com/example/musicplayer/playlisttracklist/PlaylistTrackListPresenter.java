@@ -1,6 +1,5 @@
 package com.example.musicplayer.playlisttracklist;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -9,14 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.musicplayer.Album;
-import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.MusicDataProvider;
-import com.example.musicplayer.PlayerControlsFragment;
+import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.Playlist;
 import com.example.musicplayer.PlaylistDataProvider;
 import com.example.musicplayer.R;
-import com.example.musicplayer.albumtracklist.AlbumTrackListContract;
 
 import java.util.ArrayList;
 

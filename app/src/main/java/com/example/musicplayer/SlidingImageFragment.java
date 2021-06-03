@@ -13,6 +13,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.musicplayer.controlspanel.PlayerScreenMotionLayout;
+import com.example.musicplayer.controlspanel.SlidingImageView;
 
 public class SlidingImageFragment extends Fragment {
     public static final String TAG = "SlidingImageFragment";

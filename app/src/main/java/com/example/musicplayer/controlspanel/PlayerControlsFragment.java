@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.controlspanel;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,10 +15,10 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -33,7 +33,14 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.musicplayer.MusicService;
+import com.example.musicplayer.R;
+import com.example.musicplayer.ServiceConnectionCallback;
+import com.example.musicplayer.SlidingImageFragment;
+import com.example.musicplayer.controlspanel.PlayerScreenMotionLayout;
+
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class PlayerControlsFragment extends Fragment {
 
@@ -64,7 +71,7 @@ public class PlayerControlsFragment extends Fragment {
     private AnimatedVectorDrawable playToPause;
     private ImageButton nextButton;
     private ImageButton prevButton;
-    private ImageView dragDown;
+    private DragDownButton dragDown;
     private TextView elapsedTime;
     private TextView fullDuration;
 
@@ -245,7 +252,6 @@ public class PlayerControlsFragment extends Fragment {
         playerControlsLayout.setTransitionListener(new MotionLayout.TransitionListener() {
             @Override
             public void onTransitionStarted(MotionLayout motionLayout, int i, int i1) {
-
                 seekBar.setEnabled(true);
                 minNextButton.setEnabled(false);
                 minTogglePauseButton.setEnabled(false);
@@ -259,8 +265,7 @@ public class PlayerControlsFragment extends Fragment {
             }
 
             @Override
-            public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
-            }
+            public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) { }
 
             @Override
             public void onTransitionCompleted(MotionLayout motionLayout, int i) {
@@ -271,8 +276,7 @@ public class PlayerControlsFragment extends Fragment {
                     minTogglePauseButton.setEnabled(true);
 
                 } else if (i == R.id.gone) {
-                    Log.d(TAG, "onTransitionCompleted");
-                    getContext().unbindService(connection);
+                    Objects.requireNonNull(getContext()).unbindService(connection);
 
                     FragmentManager manager = getActivity().getSupportFragmentManager();
                     FragmentTransaction transaction = manager.beginTransaction();
@@ -284,8 +288,7 @@ public class PlayerControlsFragment extends Fragment {
             }
 
             @Override
-            public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
-            }
+            public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) { }
         });
 
         viewPager = view.findViewById(R.id.album_cover_picture);
@@ -324,11 +327,13 @@ public class PlayerControlsFragment extends Fragment {
         togglePauseButton = view.findViewById(R.id.play_pause_button);
         nextButton = view.findViewById(R.id.next_track_button);
         prevButton = view.findViewById(R.id.prev_track_button);
-        dragDown = view.findViewById(R.id.drag_down);
         trackTitle = view.findViewById(R.id.track_title);
         artistName = view.findViewById(R.id.artist_name);
         elapsedTime = view.findViewById(R.id.elapsed_time);
         fullDuration = view.findViewById(R.id.full_duration);
+
+        dragDown = view.findViewById(R.id.drag_down);
+        dragDown.setMotionLayout(playerControlsLayout);
 
         minTogglePauseButton = view.findViewById(R.id.min_play_pause_button);
         minNextButton = view.findViewById(R.id.min_next_track_button);
@@ -343,9 +348,9 @@ public class PlayerControlsFragment extends Fragment {
         args.putSerializable(MusicService.ARG_QUEUE, tracksMetadata);
         args.putInt(MusicService.ARG_INDEX, currentPosition);
         intent.putExtras(args);
-        getContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        Objects.requireNonNull(getContext()).bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
-        getView().setFocusableInTouchMode(true);
+        Objects.requireNonNull(getView()).setFocusableInTouchMode(true);
         getView().requestFocus();
         getView().setOnKeyListener((v, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_BACK && !collapsed) {

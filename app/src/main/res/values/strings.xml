@@ -16,10 +16,15 @@
     <string name="app_label">Music Player</string>
     <string name="search_hint">Search songs</string>
 
-    <string name="empty_search_results">No songs found</string>
+    <string name="empty_search_results">No tracks found</string>
 
     <string name="shuffle_menu_option">Shuffle</string>
     <string name="delete_menu_option">Delete</string>
     <string name="add_to_playlist_menu_option">Add to playlist</string>
     <string name="delete_from_playlist_menu_option">Delete from playlist</string>
+    <string name="add_new_playlist">Add new playlist</string>
+    <string name="done">Done</string>
+
+    <string name="track_timestamp_example">3:00</string>
+    <string name="placeholder_text">Sample text</string>
 </resources>

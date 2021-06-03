@@ -11,7 +11,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/ripple_dark">
+        android:background="@drawable/ripple_dark"
+        android:clipChildren="false">
 
         <TextView
             android:id="@+id/track_duration"
@@ -19,7 +20,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Track Duration"
+            android:text="@string/placeholder_text"
             android:layout_marginBottom="9dp"
             android:textAppearance="@style/TextAppearance.MusicPlayer.TextTiny.Dark"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -34,7 +35,7 @@
             android:layout_marginStart="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Track Title"
+            android:text="@string/placeholder_text"
             android:layout_marginTop="9dp"
             android:textAppearance="@style/TextAppearance.MusicPlayer.TextRegular.Dark"
             app:layout_constraintBottom_toTopOf="@+id/track_duration"
@@ -51,7 +52,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:gravity="center"
-            android:text="0"
+            android:text="@string/placeholder_text"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.MusicPlayer.TextSmall.Dark"
             app:layout_constraintStart_toStartOf="parent"
@@ -63,11 +64,13 @@
 
         <ImageButton
             android:id="@+id/track_options_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/options_button_size"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:scaleType="fitXY"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:background="@android:color/transparent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_baseline_more_vert_24"
             android:tint="@color/musicplayer_gray"
             app:layout_constraintBottom_toBottomOf="parent"

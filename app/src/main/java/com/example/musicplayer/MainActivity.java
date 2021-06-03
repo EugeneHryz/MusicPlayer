@@ -1,20 +1,17 @@
 package com.example.musicplayer;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,11 +19,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.os.HandlerCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.musicplayer.albumtracklist.AlbumTrackListFragment;
+import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.playlisttracklist.PlaylistTrackListFragment;
 
 import java.util.ArrayList;
@@ -37,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE = 1;
     private static final String TAG = "MainActivity1";
-    public static final String defaultSongCollectionTitle = "Download";
-    private Fragment mainFragment;
 
     private ExecutorService executorService;
     private Handler mainThreadHandler;
@@ -67,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private void addInitialFragment() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         TabViewFragment tabViewFragment = new TabViewFragment(executorService, mainThreadHandler);
-        mainFragment = tabViewFragment;
         fragmentTransaction.add(R.id.fragment_container, tabViewFragment);
         fragmentTransaction.commit();
     }
@@ -83,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.d(TAG, "onNewIntent");
         super.onNewIntent(intent);
 
         String action = intent.getAction();
@@ -132,14 +125,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        /*if (resultCode < 0) {
-            FragmentManager manager = getSupportFragmentManager();
+        if (resultCode < 0 && requestCode == PlaylistsBottomSheetFragment.REQUEST_CODE) {
 
-            PlaylistsBottomSheetFragment fragment = (PlaylistsBottomSheetFragment)
-                    manager.findFragmentByTag(PlaylistsBottomSheetFragment.TAG);
-            if (fragment != null) {
-                fragment.addTrackToPlaylists(requestCode);
+            AppContainer container = ((MusicPlayerApp) getApplication()).appContainer;
+            if (container.savedValues != null) {
+                PlaylistDataProvider dataProvider = container.playlistDataProvider;
+
+                Log.d(TAG, "hello there");
+                if (container.savedValues.size() == container.valuesToInsert) {
+                    Log.d(TAG, container.valuesToInsert + " " + container.playListId);
+
+                    for (ContentValues values : container.savedValues) {
+                        Log.d(TAG, "actually adding track");
+                        dataProvider.addTrackToPlaylist(container.playListId, values,
+                                PlaylistsBottomSheetFragment.REQUEST_CODE);
+                    }
+                    container.savedValues = null;
+                }
             }
-        }*/
+        }
     }
 }

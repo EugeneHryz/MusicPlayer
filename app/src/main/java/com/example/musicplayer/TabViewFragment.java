@@ -24,6 +24,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.musicplayer.albumlist.AlbumListFragment;
 import com.example.musicplayer.albumlist.AlbumListPresenter;
+import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.playlistlist.PlaylistListPresenter;
 import com.example.musicplayer.playlistlist.PlaylistListFragment;
 import com.example.musicplayer.tracklist.TrackListFragment;
@@ -66,7 +67,7 @@ public class TabViewFragment extends Fragment {
         tabLayoutMediator.attach();
 
         MaterialToolbar toolbar = (MaterialToolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
     }
 

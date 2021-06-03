@@ -26,8 +26,6 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.app.TaskStackBuilder;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -83,7 +81,11 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
     @Override
     public void onCreate() {
         super.onCreate();
-        player = new AudioPlayer(this, mp -> {
+        player = new AudioPlayer(this, new MediaPlayer.OnSeekCompleteListener() {
+            @Override
+            public void onSeekComplete(MediaPlayer mp) {
+                mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PLAYING));
+            }
         }, mp -> callback.onSkipToNext(), this);
 
         stateBuilder = new PlaybackStateCompat.Builder();
@@ -124,112 +126,105 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
         filter.addAction(ACTION_NEXT);
         this.registerReceiver(broadcastReceiver, filter);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            callback = new MediaSessionCompat.Callback() {
-                @Override
-                public void onPlay() {
-                    mediaSession.setActive(true);
+        callback = new MediaSessionCompat.Callback() {
+            @Override
+            public void onPlay() {
+                mediaSession.setActive(true);
+                if (!tracksMetadata.isEmpty()) {
+                    player.playAudio(Uri.parse(tracksMetadata.get(currentQueueIndex).
+                            getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)));
+                    mediaSession.setMetadata(tracksMetadata.get(currentQueueIndex));
+                }
+                mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PLAYING));
+            }
+
+            @Override
+            public void onPause() {
+                if (player.isPlaying()) {
+                    player.pausePlayback();
+                    mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PAUSED));
+                } else {
+                    player.playbackNow();
                     mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PLAYING));
-                    if (!tracksMetadata.isEmpty()) {
-                        player.playAudio(Uri.parse(tracksMetadata.get(currentQueueIndex).
-                                getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)));
-                        mediaSession.setMetadata(tracksMetadata.get(currentQueueIndex));
+                }
+            }
+
+            @Override
+            public void onSkipToNext() {
+                mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT));
+                if (currentQueueIndex < tracksMetadata.size() - 1) {
+                    currentQueueIndex++;
+                } else {
+                    currentQueueIndex = 0;
+                }
+                onPlay();
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS));
+                if (player.getCurrentPosition() < 7000) {
+                    if (currentQueueIndex > 0) {
+                        currentQueueIndex--;
+                    } else {
+                        currentQueueIndex = tracksMetadata.size() - 1;
                     }
                 }
+                onPlay();
+            }
 
-                @Override
-                public void onPause() {
-                    if (player.isPlaying()) {
-                        player.pausePlayback();
-                        mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PAUSED));
-                    } else {
-                        player.playbackNow();
-                        mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PLAYING));
-                    }
-                }
+            @Override
+            public void onStop() {
+                mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_STOPPED));
+                mediaSession.setActive(false);
+                player.releaseMediaPlayer();
+            }
 
-                @Override
-                public void onSkipToNext() {
-                    mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT));
-                    if (currentQueueIndex < tracksMetadata.size() - 1) {
-                        currentQueueIndex++;
-                    } else {
-                        currentQueueIndex = 0;
-                    }
+            @Override
+            public void onSkipToQueueItem(long id) {
+                mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM));
+                if (!tracksMetadata.isEmpty() && id >= 0 && id < tracksMetadata.size()) {
+                    currentQueueIndex = (int)id;
                     onPlay();
                 }
+            }
 
-                @Override
-                public void onSkipToPrevious() {
-                    mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS));
-                    if (player.getCurrentPosition() < 7000) {
-                        if (currentQueueIndex > 0) {
-                            currentQueueIndex--;
-                        } else {
-                            currentQueueIndex = tracksMetadata.size() - 1;
-                        }
-                    }
-                    onPlay();
-                }
+            @Override
+            public void onSeekTo(long pos) {
+                player.seekTo((int) pos);
+                mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_BUFFERING));
+            }
 
-                @Override
-                public void onStop() {
-                    mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_STOPPED));
-                    mediaSession.setActive(false);
-                    player.releaseMediaPlayer();
-                }
+            @Override
+            public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+                KeyEvent mediaEvent = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 
-                @Override
-                public void onSkipToQueueItem(long id) {
-                    mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM));
-                    if (!tracksMetadata.isEmpty() && id >= 0 && id < tracksMetadata.size()) {
-                        currentQueueIndex = (int)id;
-                        onPlay();
+                if (mediaEvent.getAction() == KeyEvent.ACTION_UP) {
+                    int keyCode = mediaEvent.getKeyCode();
+                    switch (keyCode) {
+                        case KeyEvent.KEYCODE_MEDIA_NEXT:
+                            onSkipToNext();
+                            break;
+                        case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                            onSkipToPrevious();
+                            break;
+                        case KeyEvent.KEYCODE_MEDIA_PLAY:
+                        case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                            onPause();
+                            break;
                     }
                 }
+                return true;
+            }
+        };
 
-                @Override
-                public void onSeekTo(long pos) {
-                    mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_BUFFERING));
-                    player.seekTo((int) pos);
-                }
+        mediaSession = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
+        mediaSession.setCallback(callback);
+        mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_NONE));
+        mediaSession.setMetadata(new MediaMetadataCompat.Builder().build());
 
-                @Override
-                public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-                    KeyEvent mediaEvent = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-
-                    if (mediaEvent.getAction() == KeyEvent.ACTION_UP) {
-                        int keyCode = mediaEvent.getKeyCode();
-                        switch (keyCode) {
-                            case KeyEvent.KEYCODE_MEDIA_NEXT:
-                                onSkipToNext();
-                                break;
-
-                            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                                onSkipToPrevious();
-                                break;
-
-                            case KeyEvent.KEYCODE_MEDIA_PLAY:
-
-                            case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                                onPause();
-                                break;
-                        }
-                    }
-                    return true;
-                }
-            };
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mediaSession = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
-            mediaSession.setCallback(callback);
-            mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_NONE));
-            mediaSession.setMetadata(new MediaMetadataCompat.Builder().build());
-
-            mediaController = new MediaControllerCompat(this, mediaSession);
-            mediaController.registerCallback(controllerCallback);
-        }
+        mediaController = new MediaControllerCompat(this, mediaSession);
+        mediaController.registerCallback(controllerCallback);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.setAction(LOAD_ACTION);
@@ -247,13 +242,17 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
         startForeground(NOTIFICATION_ID, notification);
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
     private PlaybackStateCompat createPlaybackState(int state) {
-        playbackState = stateBuilder.setState(state, currentQueueIndex, 1).build();
+        long playbackPos = 0;
+        if (state != PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM
+                && state != PlaybackStateCompat.STATE_SKIPPING_TO_NEXT
+                && state != PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS) {
+
+            if (player.isPlaybackAuthorized()) {
+                playbackPos = player.getCurrentPosition();
+            }
+        }
+        playbackState = stateBuilder.setState(state, playbackPos, 1.0f).build();
         return playbackState;
     }
 
@@ -296,9 +295,7 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
             String command = intent.getStringExtra(CMD_NAME);
             if (action.equals(ACTION_CMD)) {
                 if (command.equals(PAUSE_CMD)) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        callback.onPause();
-                    }
+                    callback.onPause();
                 } else if (command.equals(PLAY_CMD)) {
                     Bundle args = intent.getExtras();
                     tracksMetadata = (ArrayList<MediaMetadataCompat>) args.getSerializable(ARG_QUEUE);
@@ -311,12 +308,16 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
     private void handleCommand(Intent intent) {
         String action = intent.getAction();
-        if (action.equals(ACTION_TOGGLEPAUSE)) {
-            callback.onPause();
-        } else if (action.equals(ACTION_NEXT)) {
-            callback.onSkipToNext();
-        } else if (action.equals(ACTION_PREV)) {
-            callback.onSkipToPrevious();
+        switch (action) {
+            case ACTION_TOGGLEPAUSE:
+                callback.onPause();
+                break;
+            case ACTION_NEXT:
+                callback.onSkipToNext();
+                break;
+            case ACTION_PREV:
+                callback.onSkipToPrevious();
+                break;
         }
     }
 
@@ -360,9 +361,11 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
         if (playbackState.getState() == PlaybackStateCompat.STATE_PAUSED) {
             togglePauseIcon = R.drawable.ic_round_play_arrow_32;
         }
+        int smallIcon = R.drawable.ic_music_note;
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         builder.setContentIntent(contentIntent)
-                .setSmallIcon(togglePauseIcon)
+                .setSmallIcon(smallIcon)
                 .setLargeIcon(artwork)
                 .setContentTitle(title)
                 .setContentText(artist)

@@ -16,7 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.MusicDataProvider;
 import com.example.musicplayer.MusicService;
-import com.example.musicplayer.PlayerControlsFragment;
+import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
 import com.example.musicplayer.ServiceConnectionCallback;
@@ -163,7 +163,7 @@ public class TrackListPresenter implements TrackListContract.Presenter,
             trackList.add(this.trackList.get(position));
         }
 
-        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList);
+        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList, context);
         FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
         fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
     }

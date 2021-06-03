@@ -23,12 +23,12 @@ import java.util.concurrent.ExecutorService;
 
 public class AlbumListPresenter implements AlbumListContract.Presenter {
 
-    private ExecutorService executorService;
-    private Handler mainThreadHandler;
+    private final ExecutorService executorService;
+    private final Handler mainThreadHandler;
 
-    private DataProvider dataProvider;
+    private final DataProvider dataProvider;
     private AlbumListContract.View view;
-    private ArrayList<Album> albumList;
+    private final ArrayList<Album> albumList;
 
     private AlbumTrackListPresenter trackListPresenter;
 
@@ -78,7 +78,7 @@ public class AlbumListPresenter implements AlbumListContract.Presenter {
         DataProvider dataProvider = new DataProvider(context, executorService);
         ArrayList<MediaMetadataCompat> trackList = dataProvider
                 .getTrackListSynchronous(albumList.get(position), null, null);
-        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList);
+        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList, context);
 
         FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
         fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);

@@ -10,7 +10,7 @@
         android:layout_height="50dp"
         android:background="@android:color/transparent"
         android:foreground="@drawable/ripple_dark"
-        android:text="Add new playlist"
+        android:text="@string/add_new_playlist"
         android:textColor="@android:color/holo_blue_dark">
     </Button>
 
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:foreground="@drawable/ripple_dark"
-        android:text="Done"
+        android:text="@string/done"
         android:textColor="@android:color/black">
     </Button>
 

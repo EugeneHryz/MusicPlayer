@@ -1,13 +1,8 @@
 package com.example.musicplayer.albumtracklist;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -16,14 +11,9 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.musicplayer.Album;
 import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.MusicDataProvider;
-import com.example.musicplayer.MusicService;
-import com.example.musicplayer.PlayerControlsFragment;
-import com.example.musicplayer.Playlist;
-import com.example.musicplayer.PlaylistDataProvider;
+import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
-import com.example.musicplayer.ServiceConnectionCallback;
-import com.example.musicplayer.playlisttracklist.PlaylistTrackListContract;
 
 import java.util.ArrayList;
 
@@ -32,9 +22,9 @@ public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter
 
     public static final String TAG = "AlbumTrackListPresenter";
 
-    private Context context;
-    private DataProvider dataProvider;
-    private Album album;
+    private final Context context;
+    private final DataProvider dataProvider;
+    private final Album album;
     private ArrayList<MediaMetadataCompat> trackList;
 
     private boolean playRequest = false;
@@ -123,7 +113,7 @@ public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter
             trackList.add(this.trackList.get(position));
         }
 
-        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList);
+        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList, context);
         FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
         fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
     }

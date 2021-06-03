@@ -62,21 +62,16 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
     }
 
     public void playAudio(Uri audioId) {
-
         if (mediaPlayer == null || audioId != currentAudioId) {
 
             releaseMediaPlayer();
             createMediaPlayer();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                playbackAttributes = new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .build();
-                mediaPlayer.setAudioAttributes(playbackAttributes);
-            } else {
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            }
+            playbackAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build();
+            mediaPlayer.setAudioAttributes(playbackAttributes);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
@@ -116,7 +111,6 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-
         playbackNow();
     }
 
@@ -151,6 +145,8 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
     public int getDuration() { return mediaPlayer.getDuration(); }
 
     public int getCurrentPosition() { return mediaPlayer.getCurrentPosition(); }
+
+    public boolean isPlaybackAuthorized() { return playbackNowAuthorized; }
 
     @Override
     public void onAudioFocusChange(int focusChange) {

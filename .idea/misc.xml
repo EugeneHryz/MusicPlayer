@@ -11,15 +11,18 @@
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/activity_music.xml" value="0.19635416666666666" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/activity_search_results.xml" value="0.19635416666666666" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/enter_playlist_name_dialog.xml" value="0.19635416666666666" />
-        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/fragment_album_track_list.xml" value="0.19635416666666666" />
+        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/fragment_album_track_list.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/list_item_album.xml" value="0.67" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/list_item_album_track.xml" value="0.33" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/list_item_playlist.xml" value="0.25" />
-        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/list_item_playlist_card.xml" value="0.25" />
-        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/list_item_track.xml" value="0.75" />
+        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/list_item_playlist_card.xml" value="0.1" />
+        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/list_item_track.xml" value="0.5" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/music_player_motion.xml" value="0.14351851851851852" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/playlists_bottom_sheet_fragment.xml" value="0.19635416666666666" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/sliding_image_view.xml" value="0.19635416666666666" />
+        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/menu/album_popup_menu.xml" value="0.18802083333333333" />
+        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/menu/menu_album_search.xml" value="0.18802083333333333" />
+        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/menu/playlist_popup_menu.xml" value="0.18802083333333333" />
       </map>
     </option>
   </component>

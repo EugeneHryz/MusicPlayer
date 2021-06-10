@@ -25,7 +25,8 @@ public class PlaylistTrackListPresenter implements PlaylistTrackListContract.Pre
     private final Playlist playlist;
     private ArrayList<MediaMetadataCompat> trackList;
 
-    private boolean playRequest = false;
+    private boolean playRequest;
+    private boolean playlistQueueUpdated = true;
     private int bufferedPosition;
 
     private final PlaylistTrackListContract.View view;
@@ -76,26 +77,50 @@ public class PlaylistTrackListPresenter implements PlaylistTrackListContract.Pre
             playAfterTrackListLoaded(bufferedPosition);
             playRequest = false;
         }
+        if (!playlistQueueUpdated) {
+            updatePlaylistQueue();
+            playlistQueueUpdated = true;
+        }
+        view.setTrackNumber(trackList.size());
     }
 
     private void playAfterTrackListLoaded(int position) {
         FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
-        PlayerControlsFragment playerControlsFragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+        PlayerControlsFragment fragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
 
-        if (playerControlsFragment == null) {
+        if (fragment == null) {
             FragmentTransaction transaction = manager.beginTransaction();
-            playerControlsFragment = new PlayerControlsFragment(trackList, position, null);
+            fragment = new PlayerControlsFragment(trackList, position, null);
             transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
-            transaction.add(R.id.container, playerControlsFragment, PlayerControlsFragment.FRAGMENT_TAG);
+            transaction.add(R.id.container, fragment, PlayerControlsFragment.FRAGMENT_TAG);
             transaction.commit();
         } else {
-            MediaSessionCompat.Callback callback = playerControlsFragment.getMediaSessionCallback();
+            MediaSessionCompat.Callback callback = fragment.getMediaSessionCallback();
 
-            if (!(playerControlsFragment.getTrackQueue().equals(trackList))) {
-                playerControlsFragment.setTrackQueue(trackList);
-                playerControlsFragment.updateViewPager();
-            }
+            updateTrackQueue(fragment);
             callback.onSkipToQueueItem(position);
+        }
+    }
+
+    private void updatePlaylistQueue() {
+        FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
+        PlayerControlsFragment fragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+
+        if (fragment != null) {
+            updateTrackQueue(fragment);
+
+            if (trackList.isEmpty()) {
+                fragment.deletePlayerControls();
+            }
+        }
+    }
+
+    private void updateTrackQueue(PlayerControlsFragment fragment) {
+        if (trackList.size() > 0) {
+            if (!(fragment.getTrackQueue().equals(trackList))) {
+                fragment.setTrackQueue(trackList);
+                fragment.updateViewPager();
+            }
         }
     }
 
@@ -106,10 +131,17 @@ public class PlaylistTrackListPresenter implements PlaylistTrackListContract.Pre
 
     @Override
     public void deleteTrackFromPlaylist(MediaMetadataCompat trackMetadata, int position) {
-        playlistDataProvider.deleteTrackFromPlaylist(playlist.getId(),
-                Long.parseLong(trackMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)));
-        playlistDataProvider.getTrackListSynchronous(playlist, this);
+        playlistDataProvider.deleteTrackFromPlaylist(playlist.getId(), trackMetadata);
+        trackList = null;
+        playlistQueueUpdated = false;
+        playlistDataProvider.getTrackListAsynchronous(playlist, this);
+
         view.updateRecyclerView(position);
+    }
+
+    @Override
+    public int updateTrackPosition(MediaMetadataCompat metadata) {
+        return trackList.indexOf(metadata);
     }
 }
 

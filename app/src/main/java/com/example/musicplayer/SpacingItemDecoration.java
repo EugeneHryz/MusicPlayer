@@ -18,7 +18,6 @@ public class SpacingItemDecoration extends RecyclerView.ItemDecoration {
         int position = parent.getChildLayoutPosition(view);
         int column = position % spanCount;
 
-
         rect.left = spacing - spacing * column / spanCount;
         rect.right = (column + 1) * spacing / spanCount;
 

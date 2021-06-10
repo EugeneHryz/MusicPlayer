@@ -40,13 +40,6 @@ import java.util.concurrent.ExecutorService;
 public class TabViewFragment extends Fragment {
 
     private static final String TAG = "TabViewFragment";
-    private final ExecutorService executorService;
-    private final Handler mainThreadHandler;
-
-    public TabViewFragment(ExecutorService executorService, Handler mainThreadHandler) {
-        this.executorService = executorService;
-        this.mainThreadHandler = mainThreadHandler;
-    }
 
     @Nullable
     @Override
@@ -56,6 +49,7 @@ public class TabViewFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         ViewPager2 viewPager = view.findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
@@ -72,6 +66,7 @@ public class TabViewFragment extends Fragment {
     }
 
     private String getTabText(int position) {
+
         if (position == 0) return getString(R.string.albums);
         if (position == 1) return getString(R.string.tracks);
         return getString(R.string.playlists);
@@ -79,6 +74,7 @@ public class TabViewFragment extends Fragment {
 
     private int getTabIconId(int position) {
         if (position == 0) return R.drawable.ic_round_album_24;
+
         return R.drawable.ic_round_library_music_24;
     }
 
@@ -114,36 +110,31 @@ public class TabViewFragment extends Fragment {
         });
 
         ImageView closeButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.onActionViewCollapsed();
-            }
-        });
+        closeButton.setOnClickListener(v -> searchView.onActionViewCollapsed());
     }
 
     private void setupViewPager(ViewPager2 viewPager) {
+
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(this);
 
         AlbumListFragment albumListFragment = new AlbumListFragment();
-        AlbumListPresenter albumListPresenter = new AlbumListPresenter(new DataProvider(getContext(),
-                executorService, mainThreadHandler), albumListFragment, executorService, mainThreadHandler);
+        AlbumListPresenter albumListPresenter = new AlbumListPresenter(getContext(),
+                albumListFragment, new DataProvider(getContext()));
         pagerAdapter.addFragment(albumListFragment);
 
         TrackListFragment trackListFragment = new TrackListFragment();
-        TrackListPresenter trackListPresenter = new TrackListPresenter(new DataProvider(getContext(),
-                executorService, mainThreadHandler), trackListFragment, getContext());
+        TrackListPresenter trackListPresenter = new TrackListPresenter(getContext(), trackListFragment);
         pagerAdapter.addFragment(trackListFragment);
 
         PlaylistListFragment playlistsFragment = new PlaylistListFragment();
-        PlaylistListPresenter playlistPresenter = new PlaylistListPresenter(new PlaylistDataProvider(getContext()),
-                playlistsFragment, executorService, mainThreadHandler);
-
+        PlaylistListPresenter playlistPresenter = new PlaylistListPresenter(getContext(), playlistsFragment);
         pagerAdapter.addFragment(playlistsFragment);
+
         viewPager.setAdapter(pagerAdapter);
     }
 
     private static class ViewPagerAdapter extends FragmentStateAdapter {
+
         private final List<Fragment> fragments = new ArrayList<>();
 
         public ViewPagerAdapter(Fragment fragment) { super(fragment); }

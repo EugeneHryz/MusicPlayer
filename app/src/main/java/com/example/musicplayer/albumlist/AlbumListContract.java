@@ -12,7 +12,7 @@ public interface AlbumListContract {
 
         void addAlbumTrackListFragment(android.view.View view, String transitionName, Album album);
 
-        void showBottomDialogFragment(int position, Context context);
+        void showBottomDialogFragment(int position);
     }
 
     interface View extends BaseView<AlbumListPresenter> {

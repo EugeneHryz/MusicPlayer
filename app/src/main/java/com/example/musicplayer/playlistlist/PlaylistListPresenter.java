@@ -1,5 +1,6 @@
 package com.example.musicplayer.playlistlist;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -10,6 +11,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.Transition;
 import androidx.transition.TransitionInflater;
 
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.MusicPlayerApp;
 import com.example.musicplayer.Playlist;
 import com.example.musicplayer.PlaylistDataProvider;
 import com.example.musicplayer.R;
@@ -22,20 +25,27 @@ import java.util.concurrent.ExecutorService;
 public class PlaylistListPresenter implements PlaylistListContract.Presenter {
     private static final String TAG = "PlaylistListPresenter";
 
-    private ExecutorService executorService;
-    private Handler mainThreadHandler;
+    private final ExecutorService executorService;
+    private final Handler mainThreadHandler;
 
-    private PlaylistDataProvider playlistDataProvider;
-    private PlaylistListContract.View view;
+    private final PlaylistDataProvider playlistDataProvider;
+    private final PlaylistListContract.View view;
     private ArrayList<Playlist> playlists;
 
-    public PlaylistListPresenter(PlaylistDataProvider playlistDataProvider, PlaylistListContract.View view,
-                                 ExecutorService executorService, Handler mainThreadHandler) {
-        this.playlistDataProvider = playlistDataProvider;
-        this.view = view;
-        this.executorService = executorService;
-        this.mainThreadHandler = mainThreadHandler;
+    public PlaylistListPresenter(Context context, PlaylistListContract.View view) {
+        AppContainer container = ((MusicPlayerApp) context.getApplicationContext()).appContainer;
 
+        this.playlistDataProvider = container.playlistDataProvider;
+        this.view = view;
+        this.executorService = container.executorService;
+        this.mainThreadHandler = container.mainThreadHandler;
+
+        start();
+
+        view.setPresenter(this);
+    }
+
+    public void start() {
         playlists = new ArrayList<>();
         Cursor cursor = playlistDataProvider.queryAllPlaylists();
         if (cursor != null) {
@@ -49,8 +59,6 @@ public class PlaylistListPresenter implements PlaylistListContract.Presenter {
                 playlists.add(new Playlist(name, id));
             }
         }
-
-        view.setPresenter(this);
     }
 
     @Override
@@ -98,7 +106,7 @@ public class PlaylistListPresenter implements PlaylistListContract.Presenter {
 
     @Override
     public void deletePlaylist(long playlistId, int position) {
-        Log.d(TAG, Integer.toString(playlistDataProvider.deletePlaylist(playlistId)));
+        playlistDataProvider.deletePlaylist(playlistId);
         view.updateRecyclerView(position);
     }
 }

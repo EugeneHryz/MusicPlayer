@@ -1,5 +1,6 @@
 package com.example.musicplayer.tracklist;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -124,16 +125,20 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
     }
 
     public static class TrackViewHolder extends RecyclerView.ViewHolder {
-        private View view;
+        private final View view;
+
         public TrackViewHolder(@NonNull View view) {
             super(view);
+
             this.view = view;
         }
+
         public View getView() { return view; }
     }
 
     @Override
     public void toggleEqualizerAnimation(View view, boolean resume, boolean visible) {
+
         if (view != null) {
             VuMeterView equalizerAnimation = view.findViewById(R.id.equalizer_animation);
             if (equalizerAnimation != null) {
@@ -151,27 +156,11 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void rebindItems() {
         if (recyclerView != null && recyclerView.getAdapter() != null) {
             recyclerView.getAdapter().notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        Log.d(TAG, "onResume");
-        super.onResume();
-    }
-
-    @Override
-    public void onStop() {
-        Log.d(TAG, "onStop");
-        super.onStop();
     }
 }

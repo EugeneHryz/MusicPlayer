@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +28,7 @@ public class PlaylistDataProvider implements MusicDataProvider {
     private Handler mainThreadHandler;
     private int itemCount = 0;
 
-    private final ArrayList<MediaMetadataCompat> trackList;
+    private ArrayList<MediaMetadataCompat> trackList;
 
     private final AppContainer container;
 
@@ -49,11 +50,11 @@ public class PlaylistDataProvider implements MusicDataProvider {
         this.mainThreadHandler = mainThreadHandler;
     }
 
-    public void createPlaylist(String playlistName) {
-        ContentValues values = new ContentValues(1);
+    public Uri createPlaylist(String playlistName) {
+        ContentValues values = new ContentValues();
         values.put(MediaStore.Audio.Playlists.NAME, playlistName);
 
-        context.getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, values);
+        return context.getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, values);
     }
 
     public Cursor queryAllPlaylists() {
@@ -97,24 +98,31 @@ public class PlaylistDataProvider implements MusicDataProvider {
     }
 
     public int deletePlaylist(long playlistId) {
-        String selection = MediaStore.Audio.Playlists._ID + "=?";
-        String[] selectionArgs = { Long.toString(playlistId) };
+
+        String localStringBuilder = "_id IN (" + (playlistId) + ")";
 
         return context.getContentResolver().delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                selection, selectionArgs);
+                localStringBuilder, null);
     }
 
-    public int deleteTrackFromPlaylist(long playlistId, long trackId) {
+    public int deleteTrackFromPlaylist(long playlistId, MediaMetadataCompat metadata) {
+        String trackId = metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
         String selection = MediaStore.Audio.Playlists.Members._ID + "=?";
-        String[] selectionArgs = { Long.toString(trackId) };
+        String[] selectionArgs = { trackId };
 
         return context.getContentResolver().delete(uri, selection, selectionArgs);
+    }
+
+    public int getTrackPosition(MediaMetadataCompat metadata) {
+        return trackList != null ? trackList.indexOf(metadata) : -1;
     }
 
     public void getTrackListAsynchronous(Playlist playlist, MusicDataProvider.GetTrackListCallback trackListCallback) {
         if (executor != null) {
             executor.execute(() -> {
+                trackList = new ArrayList<>();
                 getTrackListSynchronous(playlist, trackListCallback);
                 if (mainThreadHandler != null) {
                     mainThreadHandler.post(() -> trackListCallback.onTrackListLoaded(trackList));
@@ -125,9 +133,10 @@ public class PlaylistDataProvider implements MusicDataProvider {
 
     public ArrayList<MediaMetadataCompat> getTrackListSynchronous(Playlist playlist, MusicDataProvider.GetTrackListCallback trackListCallback) {
 
-        String[] projection = {MediaStore.Audio.Playlists.Members.TITLE, MediaStore.Audio.Playlists.Members.ARTIST,
+        String[] projection = { MediaStore.Audio.Playlists.Members.TITLE, MediaStore.Audio.Playlists.Members.ARTIST,
                 MediaStore.Audio.Playlists.Members.ALBUM, MediaStore.Audio.Playlists.Members._ID,
-                MediaStore.Audio.Playlists.Members.ALBUM_ID, MediaStore.Audio.Playlists.Members.DURATION};
+                MediaStore.Audio.Playlists.Members.ALBUM_ID, MediaStore.Audio.Playlists.Members.DURATION };
+
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlist.getId());
         Cursor cursor = context.getContentResolver().query(uri,
                 projection, null, null, null);

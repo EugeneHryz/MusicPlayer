@@ -104,7 +104,6 @@ public class PlayerControlsFragment extends Fragment {
         connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                Log.d(TAG, "onServiceConnected");
                 if (connectionCallback != null) {
                     connectionCallback.onServiceConnected(name, service);
                 }
@@ -116,6 +115,7 @@ public class PlayerControlsFragment extends Fragment {
                 controller.registerCallback(new MediaControllerCompat.Callback() {
                     @Override
                     public void onPlaybackStateChanged(PlaybackStateCompat state) {
+
                         if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
                             if (previousPlaybackState == null || previousPlaybackState.getState() == PlaybackStateCompat.STATE_PAUSED) {
                                 minTogglePauseButton.setImageResource(R.drawable.ic_round_pause_32);
@@ -138,6 +138,7 @@ public class PlayerControlsFragment extends Fragment {
 
                     @Override
                     public void onMetadataChanged(MediaMetadataCompat metadata) {
+
                         String title = metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
                         String artist = metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
                         trackTitle.setText(title);
@@ -257,10 +258,12 @@ public class PlayerControlsFragment extends Fragment {
                 minTogglePauseButton.setEnabled(false);
                 collapsed = false;
 
-                if (controller.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
-                    togglePauseButton.setImageResource(R.drawable.ic_round_pause_24);
-                } else if (controller.getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED) {
-                    togglePauseButton.setImageResource(R.drawable.ic_round_play_arrow_24);
+                if (controller != null) {
+                    if (controller.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
+                        togglePauseButton.setImageResource(R.drawable.ic_round_pause_24);
+                    } else if (controller.getPlaybackState().getState() == PlaybackStateCompat.STATE_PAUSED) {
+                        togglePauseButton.setImageResource(R.drawable.ic_round_play_arrow_24);
+                    }
                 }
             }
 
@@ -276,11 +279,8 @@ public class PlayerControlsFragment extends Fragment {
                     minTogglePauseButton.setEnabled(true);
 
                 } else if (i == R.id.gone) {
-                    Objects.requireNonNull(getContext()).unbindService(connection);
+                    deletePlayerControls();
 
-                    FragmentManager manager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction transaction = manager.beginTransaction();
-                    transaction.remove(fragment).commit();
                     if (connectionCallback != null) {
                         connectionCallback.onUnbind();
                     }
@@ -295,6 +295,7 @@ public class PlayerControlsFragment extends Fragment {
         ImageSliderAdapter adapter = new ImageSliderAdapter(getActivity());
         viewPager.setAdapter(adapter);
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+
             private boolean newPageSelected = false;
             private boolean userStartedDrag = false;
             private long bufferedPosition = 0;
@@ -308,6 +309,7 @@ public class PlayerControlsFragment extends Fragment {
                     }
                     userStartedDrag = false;
                 } else if (state == ViewPager2.SCROLL_STATE_DRAGGING) {
+
                     userStartedDrag = true;
                 }
             }
@@ -373,7 +375,7 @@ public class PlayerControlsFragment extends Fragment {
     }
 
     public void updateViewPager() {
-        viewPager.setAdapter(new ImageSliderAdapter(getActivity()));
+        viewPager.setAdapter(new ImageSliderAdapter(Objects.requireNonNull(getActivity())));
     }
 
     public ArrayList<MediaMetadataCompat> getTrackQueue() {
@@ -381,6 +383,14 @@ public class PlayerControlsFragment extends Fragment {
             return binder.getTrackQueue();
         }
         return null;
+    }
+
+    public void deletePlayerControls() {
+        Objects.requireNonNull(getContext()).unbindService(connection);
+
+        FragmentManager manager = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.remove(PlayerControlsFragment.this).commit();
     }
 
     private class ImageSliderAdapter extends FragmentStateAdapter {

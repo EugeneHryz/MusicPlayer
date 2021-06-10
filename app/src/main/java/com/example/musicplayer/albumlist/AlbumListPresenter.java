@@ -1,7 +1,6 @@
 package com.example.musicplayer.albumlist;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.media.MediaMetadataCompat;
 
@@ -12,7 +11,10 @@ import androidx.transition.Transition;
 import androidx.transition.TransitionInflater;
 
 import com.example.musicplayer.Album;
+import com.example.musicplayer.AppContainer;
 import com.example.musicplayer.DataProvider;
+import com.example.musicplayer.MusicDataProvider;
+import com.example.musicplayer.MusicPlayerApp;
 import com.example.musicplayer.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
 import com.example.musicplayer.albumtracklist.AlbumTrackListFragment;
@@ -21,8 +23,10 @@ import com.example.musicplayer.albumtracklist.AlbumTrackListPresenter;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
-public class AlbumListPresenter implements AlbumListContract.Presenter {
+public class AlbumListPresenter implements AlbumListContract.Presenter,
+        MusicDataProvider.GetTrackListCallback {
 
+    private final Context context;
     private final ExecutorService executorService;
     private final Handler mainThreadHandler;
 
@@ -32,12 +36,15 @@ public class AlbumListPresenter implements AlbumListContract.Presenter {
 
     private AlbumTrackListPresenter trackListPresenter;
 
-    public AlbumListPresenter(DataProvider dataProvider, AlbumListContract.View view,
-                              ExecutorService executorService, Handler mainThreadHandler) {
+    public AlbumListPresenter(Context context, AlbumListContract.View view, DataProvider dataProvider) {
+        this.context = context;
+        AppContainer container = ((MusicPlayerApp) context.getApplicationContext()).appContainer;
+
         this.dataProvider = dataProvider;
         this.view = view;
-        this.executorService = executorService;
-        this.mainThreadHandler = mainThreadHandler;
+        this.executorService = container.executorService;
+        this.mainThreadHandler = container.mainThreadHandler;
+
         albumList = dataProvider.getAlbumListSynchronous();
 
         view.setPresenter(this);
@@ -45,6 +52,7 @@ public class AlbumListPresenter implements AlbumListContract.Presenter {
 
     @Override
     public Album getDataItem(int position) {
+
         if (position < albumList.size()) {
             return albumList.get(position);
         }
@@ -74,13 +82,20 @@ public class AlbumListPresenter implements AlbumListContract.Presenter {
     }
 
     @Override
-    public void showBottomDialogFragment(int position, Context context) {
-        DataProvider dataProvider = new DataProvider(context, executorService);
-        ArrayList<MediaMetadataCompat> trackList = dataProvider
-                .getTrackListSynchronous(albumList.get(position), null, null);
+    public void trackListLoadStarted() {
+    }
+
+    @Override
+    public void onTrackListLoaded(ArrayList<MediaMetadataCompat> trackList) {
         PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList, context);
 
-        FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
-        fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
+        FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
+        fragment.show(manager, PlaylistsBottomSheetFragment.TAG);
+    }
+
+    @Override
+    public void showBottomDialogFragment(int position) {
+        DataProvider dataProvider = new DataProvider(context, executorService, mainThreadHandler);
+        dataProvider.getTrackListAsynchronous(albumList.get(position), this);
     }
 }

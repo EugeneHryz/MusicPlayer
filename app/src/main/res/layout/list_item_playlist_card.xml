@@ -8,15 +8,15 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="@drawable/ripple_light"
-    card_view:cardCornerRadius="12dp">
+    card_view:cardCornerRadius="@dimen/card_corner_radius">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false">
 
-        <ImageView
-            android:id="@+id/playlist_image"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/playlist_image_frame"
             android:layout_width="match_parent"
             android:layout_height="164dp"
             android:layout_marginStart="7dp"
@@ -24,31 +24,46 @@
             android:layout_marginTop="7dp"
             android:layout_marginEnd="7dp"
             android:layout_marginRight="7dp"
-            android:contentDescription="@string/placeholder_text"
-            android:scaleType="centerCrop"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"
-            card_view:layout_constraintTop_toTopOf="parent" />
+            card_view:layout_constraintTop_toTopOf="parent"
+            card_view:cardCornerRadius="@dimen/image_corner_radius"
+            card_view:cardElevation="@dimen/image_elevation">
+
+            <ImageView
+                android:id="@+id/playlist_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/placeholder_text"
+                android:scaleType="centerCrop" />
+
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/playlist_name_card"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="7dp"
             android:layout_marginTop="6dp"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:text="@string/placeholder_text"
             android:textAppearance="@style/TextAppearance.MusicPlayer.TextRegular.Bold"
             card_view:layout_constraintStart_toStartOf="parent"
-            card_view:layout_constraintTop_toBottomOf="@+id/playlist_image" />
+            card_view:layout_constraintTop_toBottomOf="@+id/playlist_image_frame"
+            card_view:layout_constraintEnd_toStartOf="@id/playlist_options_button"/>
 
         <TextView
             android:id="@+id/playlist_tracks_number"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/placeholder_text"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textAppearance="@style/TextAppearance.MusicPlayer.TextSmall"
             card_view:layout_constraintStart_toStartOf="@+id/playlist_name_card"
-            card_view:layout_constraintTop_toBottomOf="@+id/playlist_name_card" />
+            card_view:layout_constraintTop_toBottomOf="@+id/playlist_name_card"
+            card_view:layout_constraintEnd_toEndOf="@id/playlist_name_card"/>
 
         <ImageButton
             android:id="@+id/playlist_options_button"

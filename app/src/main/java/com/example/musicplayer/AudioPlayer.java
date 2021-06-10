@@ -142,9 +142,9 @@ public class AudioPlayer implements MediaPlayer.OnPreparedListener, MediaPlayer.
         return mediaPlayer != null && mediaPlayer.isPlaying();
     }
 
-    public int getDuration() { return mediaPlayer.getDuration(); }
+    public int getDuration() { return mediaPlayer != null ? mediaPlayer.getDuration() : 0; }
 
-    public int getCurrentPosition() { return mediaPlayer.getCurrentPosition(); }
+    public int getCurrentPosition() { return mediaPlayer != null ? mediaPlayer.getCurrentPosition() : 0; }
 
     public boolean isPlaybackAuthorized() { return playbackNowAuthorized; }
 

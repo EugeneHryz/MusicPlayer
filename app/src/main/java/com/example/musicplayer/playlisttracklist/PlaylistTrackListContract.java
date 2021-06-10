@@ -15,9 +15,13 @@ public interface PlaylistTrackListContract {
         Playlist getPlaylist();
 
         void deleteTrackFromPlaylist(MediaMetadataCompat trackMetadata, int position);
+
+        int updateTrackPosition(MediaMetadataCompat metadata);
     }
 
     interface View extends BaseView<PlaylistTrackListPresenter> {
+
+        void setTrackNumber(int number);
 
         void setupChildViews();
 

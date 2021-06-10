@@ -1,9 +1,10 @@
 package com.example.musicplayer.playlistlist;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +27,15 @@ import com.example.musicplayer.R;
 import com.example.musicplayer.SpacingItemDecoration;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class PlaylistListFragment extends Fragment implements PlaylistListContract.View {
+
+    public static final String TAG = "PlaylistListFragment";
     public static final int SPAN_COUNT = 2;
 
     private RecyclerView recyclerView;
+
     private PlaylistListContract.Presenter presenter;
     private ArrayList<Playlist> playlists;
 
@@ -45,6 +50,19 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         setupRecyclerView((RecyclerView) view);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updatePlaylists() {
+        if (recyclerView != null && recyclerView.getAdapter() != null) {
+            ((PlaylistRecyclerViewAdapter) recyclerView.getAdapter()).updateData();
+            recyclerView.getAdapter().notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -64,22 +82,8 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
 
         public PlaylistRecyclerViewAdapter() {
             super();
-            playlists = new ArrayList<>();
 
-            PlaylistDataProvider playlistDataProvider = new PlaylistDataProvider(getContext());
-            Cursor cursor = playlistDataProvider.queryAllPlaylists();
-            if (cursor != null) {
-                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists._ID);
-                int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.NAME);
-
-                while (cursor.moveToNext()) {
-                    long id = cursor.getLong(idColumn);
-                    String name = cursor.getString(nameColumn);
-
-                    playlists.add(new Playlist(name, id));
-                }
-                cursor.close();
-            }
+            updateData();
         }
 
         @NonNull
@@ -114,19 +118,16 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
                         .apply(new RequestOptions().centerCrop()).into(imageView);
 
                 String transitionName = "playlist_name" + position;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    imageView.setTransitionName(transitionName);
-                }
+                imageView.setTransitionName(transitionName);
 
                 ImageButton playlistOptionsButton = view.findViewById(R.id.playlist_options_button);
                 PopupMenu optionsMenu = new PopupMenu(getContext(), playlistOptionsButton);
                 optionsMenu.getMenuInflater().inflate(R.menu.playlist_popup_menu, optionsMenu.getMenu());
                 playlistOptionsButton.setOnClickListener(v -> optionsMenu.show());
                 optionsMenu.setOnMenuItemClickListener(item -> {
-                    switch (item.getItemId()) {
-                        case R.id.delete_action:
-                            presenter.deletePlaylist(playlist.getId(), position);
-                            break;
+
+                    if (item.getItemId() == R.id.delete_action) {
+                        presenter.deletePlaylist(playlist.getId(), position);
                     }
                     return false;
                 });
@@ -134,6 +135,27 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
                 view.setOnClickListener((v) -> {
                     presenter.addPlaylistTrackListFragment(v, transitionName, playlist);
                 });
+            }
+        }
+
+        public void updateData() {
+            playlists = new ArrayList<>();
+
+            PlaylistDataProvider playlistDataProvider = new PlaylistDataProvider(
+                    Objects.requireNonNull(getContext()));
+            Cursor cursor = playlistDataProvider.queryAllPlaylists();
+
+            if (cursor != null) {
+                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists._ID);
+                int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.NAME);
+
+                while (cursor.moveToNext()) {
+                    long id = cursor.getLong(idColumn);
+                    String name = cursor.getString(nameColumn);
+
+                    playlists.add(new Playlist(name, id));
+                }
+                cursor.close();
             }
         }
 
@@ -153,11 +175,14 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void updateRecyclerView(int position) {
         if (recyclerView != null && recyclerView.getAdapter() != null) {
-            playlists.remove(position);
-            recyclerView.getAdapter().notifyItemRemoved(position);
+            if (position < playlists.size()) {
+                playlists.remove(position);
+            }
+            recyclerView.getAdapter().notifyDataSetChanged();
         }
     }
 }

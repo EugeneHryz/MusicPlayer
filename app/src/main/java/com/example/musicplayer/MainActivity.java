@@ -6,19 +6,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
-import android.util.Pair;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.os.HandlerCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -27,30 +23,21 @@ import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.playlisttracklist.PlaylistTrackListFragment;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE = 1;
     private static final String TAG = "MainActivity1";
 
-    private ExecutorService executorService;
-    private Handler mainThreadHandler;
-
     private long backPressedElapsedTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        executorService = Executors.newFixedThreadPool(10);
-        mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
-
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) ==
-        PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             addInitialFragment();
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -61,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void addInitialFragment() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        TabViewFragment tabViewFragment = new TabViewFragment(executorService, mainThreadHandler);
+        AppContainer container = ((MusicPlayerApp) getApplication()).appContainer;
+
+        TabViewFragment tabViewFragment = new TabViewFragment();
         fragmentTransaction.add(R.id.fragment_container, tabViewFragment);
         fragmentTransaction.commit();
     }
@@ -128,15 +117,14 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode < 0 && requestCode == PlaylistsBottomSheetFragment.REQUEST_CODE) {
 
             AppContainer container = ((MusicPlayerApp) getApplication()).appContainer;
+
             if (container.savedValues != null) {
                 PlaylistDataProvider dataProvider = container.playlistDataProvider;
 
-                Log.d(TAG, "hello there");
                 if (container.savedValues.size() == container.valuesToInsert) {
                     Log.d(TAG, container.valuesToInsert + " " + container.playListId);
 
                     for (ContentValues values : container.savedValues) {
-                        Log.d(TAG, "actually adding track");
                         dataProvider.addTrackToPlaylist(container.playListId, values,
                                 PlaylistsBottomSheetFragment.REQUEST_CODE);
                     }

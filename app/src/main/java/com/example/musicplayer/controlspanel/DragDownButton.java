@@ -8,8 +8,10 @@ import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageButton;
 
-public class DragDownButton extends androidx.appcompat.widget.AppCompatImageButton {
+public class DragDownButton extends AppCompatImageButton {
+
     public static final String TAG = "DragDownButton";
 
     private PlayerScreenMotionLayout motionLayout;
@@ -26,6 +28,7 @@ public class DragDownButton extends androidx.appcompat.widget.AppCompatImageButt
                 singleTap = true;
                 if (motionLayout != null) {
                     motionLayout.transitionToStart();
+                    motionLayout.setTouchHasStarted(false);
                 }
                 return false;
             }

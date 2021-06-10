@@ -1,8 +1,6 @@
 package com.example.musicplayer.albumlist;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,9 +80,7 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
                         .apply(new RequestOptions().centerCrop()).into(imageView);
 
                 String transitionName = "album_cover" + position;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    imageView.setTransitionName(transitionName);
-                }
+                imageView.setTransitionName(transitionName);
 
                 view.setOnClickListener((v) -> {
                     presenter.addAlbumTrackListFragment(v, transitionName, album);
@@ -97,10 +93,9 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
             albumOptionsButton.setOnClickListener(v -> optionsMenu.show());
             optionsMenu.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
-                switch (itemId) {
-                    case R.id.add_to_playlist_action:
-                        presenter.showBottomDialogFragment(position, getContext());
-                        break;
+
+                if (itemId == R.id.add_to_playlist_action) {
+                    presenter.showBottomDialogFragment(position);
                 }
                 return false;
             });
@@ -108,7 +103,7 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
 
         @Override
         public int getItemCount() {
-            return presenter.getDataItemCount();
+            return presenter != null ? presenter.getDataItemCount() : 0;
         }
 
         public class AlbumViewHolder extends RecyclerView.ViewHolder {

@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 public class DataProvider implements MusicDataProvider {
+
     public static final String TAG = "DataProvider";
 
     private Cursor cursor;
     private final Context context;
     private Executor executor;
     private Handler mainThreadHandler;
-    private int itemCount = 0;
+    private int itemCount;
 
     private final ArrayList<MediaMetadataCompat> trackList;
 
@@ -38,6 +39,7 @@ public class DataProvider implements MusicDataProvider {
 
     public DataProvider(Context context, Executor executor, Handler mainThreadHandler) {
         this(context, executor);
+
         this.mainThreadHandler = mainThreadHandler;
     }
 
@@ -53,7 +55,7 @@ public class DataProvider implements MusicDataProvider {
             int titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM);
             int artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST);
 
-            albumList = new ArrayList<Album>();
+            albumList = new ArrayList<>();
             while (cursor.moveToNext()) {
 
                 long id = cursor.getLong(idColumn);
@@ -66,7 +68,10 @@ public class DataProvider implements MusicDataProvider {
                 }
             }
         }
-        itemCount = albumList.size();
+        if (albumList != null) {
+            itemCount = albumList.size();
+        }
+
         return albumList;
     }
 
@@ -107,12 +112,9 @@ public class DataProvider implements MusicDataProvider {
         cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projection, selection, selectionArgs, null);
         if (mainThreadHandler != null) {
-            mainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (trackListCallback != null) {
-                        trackListCallback.trackListLoadStarted();
-                    }
+            mainThreadHandler.post(() -> {
+                if (trackListCallback != null) {
+                    trackListCallback.trackListLoadStarted();
                 }
             });
         }
@@ -128,7 +130,7 @@ public class DataProvider implements MusicDataProvider {
             int albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
             int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
 
-            while (cursor.moveToNext()) {
+            while (!cursor.isClosed() && cursor.moveToNext()) {
                 String title = cursor.getString(titleColumn);
                 String artist = cursor.getString(artistColumn);
                 String albumTitle = cursor.getString(albumColumn);

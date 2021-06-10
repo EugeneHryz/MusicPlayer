@@ -63,13 +63,14 @@
 
         <ImageButton
             android:id="@+id/track_options_button"
+            android:visibility="visible"
             android:layout_width="@dimen/options_button_size"
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="1:1"
             android:scaleType="fitXY"
             android:layout_marginEnd="6dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless"
             android:tint="@color/musicplayer_gray"
             android:src="@drawable/ic_baseline_more_vert_24"
             app:layout_constraintBottom_toBottomOf="parent"

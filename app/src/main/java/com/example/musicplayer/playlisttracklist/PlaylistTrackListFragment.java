@@ -1,13 +1,12 @@
 package com.example.musicplayer.playlisttracklist;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,6 +39,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class PlaylistTrackListFragment extends Fragment implements PlaylistTrackListContract.View {
     public static final String TAG = "PlaylistTracksFragment";
@@ -113,9 +113,7 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
             Playlist playlist = presenter.getPlaylist();
 
             ImageView imageView = view.findViewById(R.id.album_cover_art);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                imageView.setTransitionName(getArguments().getString("transition_name"));
-            }
+            imageView.setTransitionName(getArguments().getString("transition_name"));
             Glide.with(view.getContext()).load(R.drawable.music_note_icon_light)
                     .into(new ImageViewTarget<Drawable>(imageView) {
                         @Override
@@ -172,14 +170,15 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
         }
     }
 
-    private void setTrackNumber(int number) {
+    @Override
+    public void setTrackNumber(int number) {
         String trackNumberString = number + " ";
         if (number == 1) {
             trackNumberString += "track";
         } else {
             trackNumberString += "tracks";
         }
-        ((TextView)getView().findViewById(R.id.album_artist_name)).setText(trackNumberString);
+        ((TextView) Objects.requireNonNull(getView()).findViewById(R.id.album_artist_name)).setText(trackNumberString);
     }
 
     private class PlaylistTrackRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistTrackRecyclerViewAdapter.PlaylistTrackViewHolder> {
@@ -212,11 +211,9 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
 
             trackOptionsButton.setOnClickListener(v -> optionsMenu.show());
             optionsMenu.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.delete_from_playlist_action:
-                        presenter.deleteTrackFromPlaylist(metadata, position);
-                        Log.d(TAG, position + " " + metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE));
-                        break;
+
+                if (item.getItemId() == R.id.delete_from_playlist_action) {
+                    presenter.deleteTrackFromPlaylist(metadata, position);
                 }
                 return false;
             });
@@ -241,11 +238,11 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void updateRecyclerView(int position) {
         if (recyclerView != null && recyclerView.getAdapter() != null) {
-            recyclerView.getAdapter().notifyItemRemoved(position);
+            recyclerView.getAdapter().notifyDataSetChanged();
         }
-        setTrackNumber(presenter.getDataItemCount());
     }
 }

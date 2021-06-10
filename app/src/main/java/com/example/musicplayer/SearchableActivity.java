@@ -13,6 +13,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -104,7 +105,9 @@ public class SearchableActivity extends ListActivity {
             TextView trackTitle = view.findViewById(R.id.track_title);
             TextView artistName = view.findViewById(R.id.track_artist_name);
             ImageView albumCover = view.findViewById(R.id.track_album_cover);
+            ImageButton optionsButton = view.findViewById(R.id.track_options_button);
 
+            optionsButton.setVisibility(ImageButton.GONE);
             trackTitle.setText(searchResults.get(position).getString(MediaMetadataCompat.METADATA_KEY_TITLE));
             artistName.setText(searchResults.get(position).getString(MediaMetadataCompat.METADATA_KEY_ARTIST));
             Glide.with(getApplicationContext())

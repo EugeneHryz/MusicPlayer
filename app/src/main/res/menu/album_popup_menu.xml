@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/add_to_playlist_action"
         android:title="@string/add_to_playlist_menu_option" />
 
-    <item
-        android:id="@+id/shuffle_action"
-        android:title="@string/shuffle_menu_option" />
 </menu>

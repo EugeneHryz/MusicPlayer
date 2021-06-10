@@ -1,5 +1,6 @@
 package com.example.musicplayer;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 
 import android.app.PendingIntent;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class MusicService extends Service implements AudioFocusChangedCallback {
+
     public static final String TAG = "MusicService";
 
     private MediaSessionCompat mediaSession;
@@ -77,16 +79,14 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
     public static final String MEDIA_SESSION_TAG = "MEDIA_SESSION";
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onCreate() {
         super.onCreate();
-        player = new AudioPlayer(this, new MediaPlayer.OnSeekCompleteListener() {
-            @Override
-            public void onSeekComplete(MediaPlayer mp) {
-                mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PLAYING));
-            }
-        }, mp -> callback.onSkipToNext(), this);
+        player = new AudioPlayer(this, mp -> mediaSession
+                .setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PLAYING)),
+                mp -> callback.onSkipToNext(), this);
 
         stateBuilder = new PlaybackStateCompat.Builder();
         metadataBuilder = new MediaMetadataCompat.Builder();
@@ -246,7 +246,8 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
         long playbackPos = 0;
         if (state != PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM
                 && state != PlaybackStateCompat.STATE_SKIPPING_TO_NEXT
-                && state != PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS) {
+                && state != PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS
+                && state != PlaybackStateCompat.STATE_STOPPED) {
 
             if (player.isPlaybackAuthorized()) {
                 playbackPos = player.getCurrentPosition();
@@ -392,17 +393,15 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
     @Override
     public boolean onUnbind(Intent intent) {
+        Log.d(TAG, "onUnbind");
         return true;
     }
 
     @Override
-    public void onRebind(Intent intent) {
-        Log.d(TAG, "onRebind");
-    }
-
-    @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         callback.onStop();
+        mediaSession.release();
         unregisterReceiver(broadcastReceiver);
     }
 }

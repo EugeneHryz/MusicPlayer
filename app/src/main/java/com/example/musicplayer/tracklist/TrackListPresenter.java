@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.MusicDataProvider;
+import com.example.musicplayer.MusicPlayerApp;
 import com.example.musicplayer.MusicService;
 import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.PlaylistsBottomSheetFragment;
@@ -28,25 +29,25 @@ public class TrackListPresenter implements TrackListContract.Presenter,
 
     public static final String TAG = "TrackListPresenter";
 
-    private DataProvider dataProvider;
-    private TrackListContract.View view;
-    private Context context;
+    private final DataProvider dataProvider;
+    private final TrackListContract.View view;
+    private final Context context;
     private ArrayList<MediaMetadataCompat> trackList;
 
     private boolean playRequest = false;
     private int bufferedPosition;
 
     private boolean isPlaying;
-    private boolean bound;
 
     private MusicService.LocalBinder binder;
     private MediaControllerCompat controller;
     private MediaControllerCompat.Callback controllerCallback;
 
-    public TrackListPresenter(DataProvider dataProvider, TrackListContract.View view, Context context) {
-        this.dataProvider = dataProvider;
-        this.view = view;
+    public TrackListPresenter(Context context, TrackListContract.View view) {
         this.context = context;
+        this.dataProvider = ((MusicPlayerApp) context.getApplicationContext())
+                .appContainer.dataProvider;
+        this.view = view;
 
         dataProvider.getTrackListAsynchronous(null, this);
 
@@ -65,7 +66,6 @@ public class TrackListPresenter implements TrackListContract.Presenter,
 
             @Override
             public void onMetadataChanged(MediaMetadataCompat metadata) {
-                Log.d(TAG, "onMetadataChanged");
                 view.rebindItems();
             }
         };
@@ -86,6 +86,7 @@ public class TrackListPresenter implements TrackListContract.Presenter,
     public void onTrackListLoaded(ArrayList<MediaMetadataCompat> trackList) {
         this.trackList = trackList;
         if (playRequest) {
+
             playAfterTrackListLoaded(bufferedPosition);
             playRequest = false;
         }
@@ -96,6 +97,7 @@ public class TrackListPresenter implements TrackListContract.Presenter,
         if (trackList == null) {
             playRequest = true;
             bufferedPosition = position;
+
         } else {
             playAfterTrackListLoaded(position);
         }
@@ -140,14 +142,12 @@ public class TrackListPresenter implements TrackListContract.Presenter,
     public void onServiceConnected(ComponentName name, IBinder service) {
         binder = (MusicService.LocalBinder) service;
         controller = binder.getMediaController();
-        bound = true;
 
         controller.registerCallback(controllerCallback);
     }
 
     @Override
     public void onUnbind() {
-        bound = false;
         view.rebindItems();
     }
 

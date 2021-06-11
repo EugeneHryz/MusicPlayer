@@ -6,8 +6,10 @@ import android.view.View;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SpacingItemDecoration extends RecyclerView.ItemDecoration {
+
     private final int spacing;
     private final int spanCount;
+
     public SpacingItemDecoration(int spacing, int spanCount) {
         this.spanCount = spanCount;
         this.spacing = spacing;

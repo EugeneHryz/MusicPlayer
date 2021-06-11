@@ -120,7 +120,7 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
 
         @Override
         public int getItemCount() {
-            return presenter.getDataItemCount();
+            return presenter !=null ? presenter.getDataItemCount() : 0;
         }
     }
 

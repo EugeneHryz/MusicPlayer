@@ -12,11 +12,10 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/top_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="scroll|snap|enterAlways"
-            app:menu="@menu/top_app_bar"
             app:title="@string/gallery_title" />
 
         <com.google.android.material.tabs.TabLayout

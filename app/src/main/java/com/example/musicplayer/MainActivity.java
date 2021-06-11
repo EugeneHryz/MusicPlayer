@@ -47,12 +47,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addInitialFragment() {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        AppContainer container = ((MusicPlayerApp) getApplication()).appContainer;
+        TabViewFragment fragment = (TabViewFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_container);
 
-        TabViewFragment tabViewFragment = new TabViewFragment();
-        fragmentTransaction.add(R.id.fragment_container, tabViewFragment);
-        fragmentTransaction.commit();
+        if (fragment == null) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            fragment = new TabViewFragment();
+            transaction.add(R.id.fragment_container, fragment);
+            transaction.commit();
+        }
     }
 
     @Override

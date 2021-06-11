@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="@dimen/card_album_width"
-    android:layout_height="@dimen/card_album_height"
-    card_view:cardElevation="@dimen/card_elevation"
-    card_view:cardBackgroundColor="@color/musicplayer_light_cherry"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/card_album_width_portrait"
+    android:layout_height="wrap_content"
+    app:cardElevation="@dimen/card_elevation"
+    app:cardBackgroundColor="@color/musicplayer_light_cherry"
     android:clickable="true"
     android:focusable="true"
     android:foreground="@drawable/ripple_light"
-    card_view:cardCornerRadius="@dimen/card_corner_radius">
+    app:cardCornerRadius="@dimen/card_corner_radius">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -17,18 +17,19 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/playlist_image_frame"
-            android:layout_width="match_parent"
-            android:layout_height="164dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
             android:layout_marginStart="7dp"
             android:layout_marginLeft="7dp"
             android:layout_marginTop="7dp"
             android:layout_marginEnd="7dp"
             android:layout_marginRight="7dp"
-            card_view:layout_constraintEnd_toEndOf="parent"
-            card_view:layout_constraintStart_toStartOf="parent"
-            card_view:layout_constraintTop_toTopOf="parent"
-            card_view:cardCornerRadius="@dimen/image_corner_radius"
-            card_view:cardElevation="@dimen/image_elevation">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:cardCornerRadius="@dimen/image_corner_radius"
+            app:cardElevation="@dimen/image_elevation">
 
             <ImageView
                 android:id="@+id/playlist_image"
@@ -49,33 +50,34 @@
             android:ellipsize="end"
             android:text="@string/placeholder_text"
             android:textAppearance="@style/TextAppearance.MusicPlayer.TextRegular.Bold"
-            card_view:layout_constraintStart_toStartOf="parent"
-            card_view:layout_constraintTop_toBottomOf="@+id/playlist_image_frame"
-            card_view:layout_constraintEnd_toStartOf="@id/playlist_options_button"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/playlist_image_frame"
+            app:layout_constraintEnd_toStartOf="@id/playlist_options_button"/>
 
         <TextView
             android:id="@+id/playlist_tracks_number"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/card_bottom_padding"
             android:text="@string/placeholder_text"
             android:maxLines="1"
             android:ellipsize="end"
             android:textAppearance="@style/TextAppearance.MusicPlayer.TextSmall"
-            card_view:layout_constraintStart_toStartOf="@+id/playlist_name_card"
-            card_view:layout_constraintTop_toBottomOf="@+id/playlist_name_card"
-            card_view:layout_constraintEnd_toEndOf="@id/playlist_name_card"/>
+            app:layout_constraintStart_toStartOf="@+id/playlist_name_card"
+            app:layout_constraintTop_toBottomOf="@+id/playlist_name_card"
+            app:layout_constraintEnd_toEndOf="@id/playlist_name_card"/>
 
         <ImageButton
             android:id="@+id/playlist_options_button"
             android:layout_width="@dimen/options_button_size"
             android:layout_height="0dp"
-            card_view:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintDimensionRatio="1:1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:scaleType="fitXY"
             android:src="@drawable/ic_baseline_more_vert_24"
-            card_view:layout_constraintEnd_toEndOf="parent"
-            card_view:layout_constraintTop_toTopOf="@+id/playlist_name_card" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/playlist_name_card" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

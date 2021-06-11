@@ -41,7 +41,7 @@ public class TrackListPresenter implements TrackListContract.Presenter,
 
     private MusicService.LocalBinder binder;
     private MediaControllerCompat controller;
-    private MediaControllerCompat.Callback controllerCallback;
+    private final MediaControllerCompat.Callback controllerCallback;
 
     public TrackListPresenter(Context context, TrackListContract.View view) {
         this.context = context;
@@ -116,7 +116,8 @@ public class TrackListPresenter implements TrackListContract.Presenter,
         } else {
             MediaSessionCompat.Callback callback = playerControlsFragment.getMediaSessionCallback();
 
-            if (!(playerControlsFragment.getTrackQueue().equals(trackList))) {
+            if (playerControlsFragment.getTrackQueue() != null &&
+                    !(playerControlsFragment.getTrackQueue().equals(trackList))) {
                 playerControlsFragment.setTrackQueue(trackList);
                 playerControlsFragment.updateViewPager();
             }

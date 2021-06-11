@@ -87,6 +87,9 @@ public class PlayerControlsFragment extends Fragment {
 
     private PlaybackStateCompat previousPlaybackState;
 
+    public PlayerControlsFragment() {
+    }
+
     public PlayerControlsFragment(ArrayList<MediaMetadataCompat> tracksMetadata, int position,
                                   ServiceConnectionCallback callback) {
         super();

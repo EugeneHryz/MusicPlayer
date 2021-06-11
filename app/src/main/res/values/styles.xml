@@ -92,6 +92,10 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <style name="TextAppearance.MusicPlayer.TextSmall.Landscape">
+        <item name="android:textSize">@dimen/landscape_small_text_size</item>
+    </style>
+
     <style name="TextAppearance.MusicPlayer.TextTiny" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@color/musicplayer_white</item>
     </style>
@@ -101,6 +105,14 @@
     </style>
 
     <style name="TextAppearance.MusicPlayer.TextRegular.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextRegular.Landscape">
+        <item name="android:textSize">@dimen/landscape_regular_text_size</item>
+    </style>
+
+    <style name="TextAppearance.MusicPlayer.TextRegular.Landscape.Bold">
         <item name="android:textStyle">bold</item>
     </style>
 

@@ -9,8 +9,11 @@
     <dimen name="tab_padding_top">4dp</dimen>
     <dimen name="tab_indicator_height">4dp</dimen>
     <dimen name="grid_item_spacing">12dp</dimen>
-    <dimen name="card_album_width">178dp</dimen>
-    <dimen name="card_album_height">226dp</dimen>
+    <!--old card dimens width: 178, height: 226 -->
+    <!--358dp width -->
+    <dimen name="card_album_width_portrait">178dp</dimen>
+    <dimen name="card_album_width_landscape">358dp</dimen>
+
     <dimen name="card_elevation">6dp</dimen>
     <dimen name="standard_elevation">8dp</dimen>
     <dimen name="standard_text_size">16sp</dimen>
@@ -24,4 +27,10 @@
     <dimen name="image_elevation">0dp</dimen>
 
     <dimen name="options_button_size">30dp</dimen>
+    <dimen name="options_button_size_landscape">36dp</dimen>
+
+    <dimen name="card_bottom_padding">6dp</dimen>
+
+    <dimen name="landscape_regular_text_size">30sp</dimen>
+    <dimen name="landscape_small_text_size">18sp</dimen>
 </resources>

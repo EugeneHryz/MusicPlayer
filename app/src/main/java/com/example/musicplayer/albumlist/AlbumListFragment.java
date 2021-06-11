@@ -34,9 +34,14 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         recyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_list, container, false);
 
-        setupRecyclerView();
-
         return recyclerView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        setupRecyclerView();
     }
 
     private void setupRecyclerView() {
@@ -53,7 +58,7 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
 
     private class AlbumRecyclerViewAdapter extends RecyclerView.Adapter<AlbumRecyclerViewAdapter.AlbumViewHolder> {
 
-        private  static final String TAG = "AlbumListAdapter";
+        private static final String TAG = "AlbumListAdapter";
 
         @NonNull
         @Override
@@ -82,9 +87,8 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
                 String transitionName = "album_cover" + position;
                 imageView.setTransitionName(transitionName);
 
-                view.setOnClickListener((v) -> {
-                    presenter.addAlbumTrackListFragment(v, transitionName, album);
-                });
+                view.setOnClickListener((v) ->
+                        presenter.addAlbumTrackListFragment(v, transitionName, album));
             }
 
             ImageButton albumOptionsButton = view.findViewById(R.id.album_options_button);

@@ -35,6 +35,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
 public class TabViewFragment extends Fragment {
@@ -43,47 +44,40 @@ public class TabViewFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_tab_view, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         ViewPager2 viewPager = view.findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         TabLayout tabLayout = view.findViewById(R.id.tabs);
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> {
-            tab.setText(getTabText(position));
-        });
+                (tab, position) -> tab.setText(getTabText(position)));
         tabLayoutMediator.attach();
 
-        MaterialToolbar toolbar = (MaterialToolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        MaterialToolbar toolbar = (MaterialToolbar) view.findViewById(R.id.top_toolbar);
+        ((AppCompatActivity) Objects.requireNonNull(getContext())).setSupportActionBar(toolbar);
+
         setHasOptionsMenu(true);
     }
 
     private String getTabText(int position) {
-
         if (position == 0) return getString(R.string.albums);
         if (position == 1) return getString(R.string.tracks);
+
         return getString(R.string.playlists);
-    }
-
-    private int getTabIconId(int position) {
-        if (position == 0) return R.drawable.ic_round_album_24;
-
-        return R.drawable.ic_round_library_music_24;
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.top_app_bar, menu);
-        super.onCreateOptionsMenu(menu, inflater);
 
-        SearchManager searchManager = (SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager) Objects.requireNonNull(getContext())
+                .getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), SearchableActivity.class)));
@@ -92,12 +86,12 @@ public class TabViewFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "text submitted");
                 searchView.onActionViewCollapsed();
-                FragmentManager manager = getActivity().getSupportFragmentManager();
+                FragmentManager manager = Objects.requireNonNull(getActivity())
+                        .getSupportFragmentManager();
                 Fragment fragment = manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
                 if (fragment != null) {
-                    fragment.getView().setFocusableInTouchMode(true);
+                    Objects.requireNonNull(fragment.getView()).setFocusableInTouchMode(true);
                     fragment.getView().requestFocus();
                 }
                 return false;
@@ -118,15 +112,18 @@ public class TabViewFragment extends Fragment {
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(this);
 
         AlbumListFragment albumListFragment = new AlbumListFragment();
-        AlbumListPresenter albumListPresenter = new AlbumListPresenter(getContext(),
+        albumListFragment.setRetainInstance(true);
+        AlbumListPresenter albumListPresenter = new AlbumListPresenter(Objects.requireNonNull(getContext()),
                 albumListFragment, new DataProvider(getContext()));
         pagerAdapter.addFragment(albumListFragment);
 
         TrackListFragment trackListFragment = new TrackListFragment();
+        trackListFragment.setRetainInstance(true);
         TrackListPresenter trackListPresenter = new TrackListPresenter(getContext(), trackListFragment);
         pagerAdapter.addFragment(trackListFragment);
 
         PlaylistListFragment playlistsFragment = new PlaylistListFragment();
+        playlistsFragment.setRetainInstance(true);
         PlaylistListPresenter playlistPresenter = new PlaylistListPresenter(getContext(), playlistsFragment);
         pagerAdapter.addFragment(playlistsFragment);
 

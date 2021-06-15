@@ -40,7 +40,7 @@ import java.util.concurrent.ExecutorService;
 
 public class TabViewFragment extends Fragment {
 
-    private static final String TAG = "TabViewFragment";
+    public static final String TAG = "TabViewFragment";
 
     @Nullable
     @Override

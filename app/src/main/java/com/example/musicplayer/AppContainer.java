@@ -20,18 +20,18 @@ public class AppContainer {
         executorService  = Executors.newFixedThreadPool(10);
         mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
 
-        playlistDataProvider = new PlaylistDataProvider(context, executorService, mainThreadHandler);
         dataProvider = new DataProvider(context, executorService, mainThreadHandler);
+        playlistDataProvider = new PlaylistDataProvider(context, executorService, mainThreadHandler);
     }
 
-    // TODO: need to place these fields into separate class
+    // TODO: need to place these fields into a separate class
     public ArrayList<ContentValues> savedValues;
     public long playListId;
     public int valuesToInsert;
 
-    public final PlaylistDataProvider playlistDataProvider;
+    public PlaylistDataProvider playlistDataProvider;
 
-    public final DataProvider dataProvider;
+    public DataProvider dataProvider;
 
     public final ExecutorService executorService;
 

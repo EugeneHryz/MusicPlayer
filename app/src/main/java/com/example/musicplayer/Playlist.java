@@ -1,6 +1,8 @@
 package com.example.musicplayer;
 
-public class Playlist {
+import java.io.Serializable;
+
+public class Playlist implements Serializable {
 
     private final String playlistName;
     private final long playlistId;

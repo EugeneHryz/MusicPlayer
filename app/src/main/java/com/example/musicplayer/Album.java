@@ -2,7 +2,9 @@ package com.example.musicplayer;
 
 import android.net.Uri;
 
-public class Album {
+import java.io.Serializable;
+
+public class Album implements Serializable {
 
     private final String title;
     private final String artist;

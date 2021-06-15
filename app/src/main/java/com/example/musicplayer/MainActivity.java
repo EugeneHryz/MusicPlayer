@@ -27,7 +27,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE = 1;
-    private static final String TAG = "MainActivity1";
+    public static final String TAG = "MainActivity1";
 
     private long backPressedElapsedTime;
 
@@ -41,22 +41,11 @@ public class MainActivity extends AppCompatActivity {
             addInitialFragment();
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
+                requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, REQUEST_CODE);
             }
         }
-    }
 
-    private void addInitialFragment() {
-        TabViewFragment fragment = (TabViewFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_container);
-
-        if (fragment == null) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            fragment = new TabViewFragment();
-            transaction.add(R.id.fragment_container, fragment);
-            transaction.commit();
-        }
+        updateAppContainer();
     }
 
     @Override
@@ -76,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
         if (action != null && action.equals(SearchableActivity.PLAY_ACTION)) {
             Bundle args = intent.getExtras();
 
-            ArrayList<MediaMetadataCompat> trackQueue = (ArrayList<MediaMetadataCompat>) args.getSerializable(SearchableActivity.QUEUE_KEY);
+            ArrayList<MediaMetadataCompat> trackQueue = (ArrayList<MediaMetadataCompat>)
+                    args.getSerializable(SearchableActivity.QUEUE_KEY);
             int position = args.getInt(SearchableActivity.POSITION_KEY);
 
             FragmentManager manager = getSupportFragmentManager();
@@ -135,6 +125,27 @@ public class MainActivity extends AppCompatActivity {
                     container.savedValues = null;
                 }
             }
+        }
+    }
+
+    private void updateAppContainer() {
+        AppContainer container = ((MusicPlayerApp) getApplicationContext()).appContainer;
+        container.dataProvider = new DataProvider(getApplicationContext(),
+                container.executorService, container.mainThreadHandler);
+        container.playlistDataProvider = new PlaylistDataProvider(getApplicationContext(),
+                container.executorService, container.mainThreadHandler);
+    }
+
+    private void addInitialFragment() {
+        TabViewFragment fragment = (TabViewFragment) getSupportFragmentManager()
+                .findFragmentByTag(TabViewFragment.TAG);
+
+        if (fragment == null) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            fragment = new TabViewFragment();
+            transaction.add(R.id.fragment_container, fragment, TabViewFragment.TAG);
+            transaction.commit();
         }
     }
 }

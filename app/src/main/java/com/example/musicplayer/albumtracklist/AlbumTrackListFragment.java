@@ -25,12 +25,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.musicplayer.Album;
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.DividerItemDecoration;
+import com.example.musicplayer.MusicPlayerApp;
 import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.R;
 import com.example.musicplayer.SearchableActivity;
@@ -39,26 +43,50 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class AlbumTrackListFragment extends Fragment implements AlbumTrackListContract.View {
+
     public static final String TAG = "AlbumTrackListFragment";
 
     private AlbumTrackListContract.Presenter presenter;
 
+    public static final String SAVED_ALBUM_KEY = "saved_album_key";
+
     private int trackListSize;
 
-    public AlbumTrackListFragment(String transitionName) {
-        super();
-        Bundle args = new Bundle();
-        args.putString("transition_name", transitionName);
-        this.setArguments(args);
-        trackListSize = 0;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+
+            Album album = (Album) savedInstanceState.getSerializable(SAVED_ALBUM_KEY);
+            if (album != null) {
+
+                AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
+                        .getApplicationContext()).appContainer;
+                presenter = new AlbumTrackListPresenter(new DataProvider(getContext(),
+                        container.executorService, container.mainThreadHandler),
+                        this, album, getContext());
+            }
+
+            androidx.transition.Transition fadeTransition = TransitionInflater.from(getContext())
+                    .inflateTransition(R.transition.fade_in);
+            setEnterTransition(fadeTransition);
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_album_track_list, container, false);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putSerializable(SAVED_ALBUM_KEY, presenter.getAlbum());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -110,9 +138,8 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             Album album = presenter.getAlbum();
 
             ImageView imageView = view.findViewById(R.id.album_cover_art);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                imageView.setTransitionName(getArguments().getString("transition_name"));
-            }
+            imageView.setTransitionName(getArguments().getString("transition_name"));
+
             Glide.with(view.getContext()).load(album.getAlbumCoverUri())
                     .placeholder(R.drawable.music_note_icon_light)
                     .into(new ImageViewTarget<Drawable>(imageView) {
@@ -202,10 +229,8 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
 
             trackOptionsButton.setOnClickListener(v -> optionsMenu.show());
             optionsMenu.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.add_track_to_playlist_action:
-                        presenter.showBottomDialogFragment(position);
-                        break;
+                if (item.getItemId() == R.id.add_track_to_playlist_action) {
+                    presenter.showBottomDialogFragment(position);
                 }
 
                 return false;

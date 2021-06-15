@@ -1,6 +1,7 @@
 package com.example.musicplayer.albumlist;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.media.MediaMetadataCompat;
 
@@ -64,10 +65,13 @@ public class AlbumListPresenter implements AlbumListContract.Presenter,
 
     @Override
     public void addAlbumTrackListFragment(android.view.View view, String transitionName, Album album) {
-        AlbumTrackListFragment fragment = new AlbumTrackListFragment(transitionName);
+        AlbumTrackListFragment fragment = new AlbumTrackListFragment();
+        Bundle args = new Bundle();
+        args.putString("transition_name", transitionName);
+        fragment.setArguments(args);
 
-        AlbumTrackListPresenter presenter = new AlbumTrackListPresenter(new DataProvider(view.getContext(), executorService, mainThreadHandler),
-                fragment, album, view.getContext());
+        AlbumTrackListPresenter presenter = new AlbumTrackListPresenter(new DataProvider(view.getContext(),
+                executorService, mainThreadHandler), fragment, album, view.getContext());
 
         FragmentTransaction transaction = ((AppCompatActivity)view.getContext())
                 .getSupportFragmentManager().beginTransaction();

@@ -2,6 +2,7 @@ package com.example.musicplayer.playlistlist;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -74,7 +75,10 @@ public class PlaylistListPresenter implements PlaylistListContract.Presenter {
 
     @Override
     public void addPlaylistTrackListFragment(android.view.View view, String transitionName, Playlist playlist) {
-        PlaylistTrackListFragment fragment = new PlaylistTrackListFragment(transitionName);
+        PlaylistTrackListFragment fragment = new PlaylistTrackListFragment();
+        Bundle args = new Bundle();
+        args.putString("transition_name", transitionName);
+        fragment.setArguments(args);
 
         PlaylistTrackListPresenter presenter = new PlaylistTrackListPresenter(new PlaylistDataProvider(view.getContext(),
                 executorService, mainThreadHandler), fragment, playlist, view.getContext());

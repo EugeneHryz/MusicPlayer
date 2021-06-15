@@ -25,11 +25,18 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.musicplayer.Album;
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.DividerItemDecoration;
+import com.example.musicplayer.MusicPlayerApp;
+import com.example.musicplayer.PlaylistDataProvider;
+import com.example.musicplayer.albumtracklist.AlbumTrackListPresenter;
 import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.Playlist;
 import com.example.musicplayer.R;
@@ -42,20 +49,36 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class PlaylistTrackListFragment extends Fragment implements PlaylistTrackListContract.View {
+
     public static final String TAG = "PlaylistTracksFragment";
+
+    public static final String SAVED_PLAYLIST_KEY = "saved_playlist_key";
 
     private PlaylistTrackListContract.Presenter presenter;
     private RecyclerView recyclerView;
 
     private int trackListSize;
 
-    public PlaylistTrackListFragment(String transitionName) {
-        super();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        Bundle args = new Bundle();
-        args.putString("transition_name", transitionName);
-        setArguments(args);
-        trackListSize = 0;
+        if (savedInstanceState != null) {
+
+            Playlist playlist = (Playlist) savedInstanceState.getSerializable(SAVED_PLAYLIST_KEY);
+            if (playlist != null) {
+
+                AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
+                        .getApplicationContext()).appContainer;
+                presenter = new PlaylistTrackListPresenter(new PlaylistDataProvider(getContext(),
+                        container.executorService, container.mainThreadHandler),
+                        this, playlist, getContext());
+            }
+
+            androidx.transition.Transition fadeTransition = TransitionInflater.from(getContext())
+                    .inflateTransition(R.transition.fade_in);
+            setEnterTransition(fadeTransition);
+        }
     }
 
     @Nullable
@@ -106,6 +129,12 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putSerializable(SAVED_PLAYLIST_KEY, presenter.getPlaylist());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void setupChildViews() {
         View view = getView();
         if (view != null && trackListSize == 0) {
@@ -116,6 +145,7 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
             imageView.setTransitionName(getArguments().getString("transition_name"));
             Glide.with(view.getContext()).load(R.drawable.music_note_icon_light)
                     .into(new ImageViewTarget<Drawable>(imageView) {
+
                         @Override
                         protected void setResource(@Nullable Drawable resource) {
                             this.setDrawable(resource);

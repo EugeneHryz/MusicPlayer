@@ -7,7 +7,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -105,13 +104,13 @@ public class TrackListPresenter implements TrackListContract.Presenter,
 
     private void playAfterTrackListLoaded(int position) {
         FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
-        PlayerControlsFragment playerControlsFragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+        PlayerControlsFragment playerControlsFragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.TAG);
 
         if (playerControlsFragment == null) {
             FragmentTransaction transaction = manager.beginTransaction();
             playerControlsFragment = new PlayerControlsFragment(trackList, position, this);
             transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
-            transaction.add(R.id.container, playerControlsFragment, PlayerControlsFragment.FRAGMENT_TAG);
+            transaction.add(R.id.container, playerControlsFragment, PlayerControlsFragment.TAG);
             transaction.commit();
         } else {
             MediaSessionCompat.Callback callback = playerControlsFragment.getMediaSessionCallback();

@@ -77,14 +77,15 @@ public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter
 
     private void playAfterTrackListLoaded(int position) {
         FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
-        PlayerControlsFragment playerControlsFragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+        PlayerControlsFragment playerControlsFragment = (PlayerControlsFragment)
+                manager.findFragmentByTag(PlayerControlsFragment.TAG);
 
         if (playerControlsFragment == null) {
             FragmentTransaction transaction = manager.beginTransaction();
             playerControlsFragment = new PlayerControlsFragment(trackList, position, null);
-            transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
-            transaction.add(R.id.container, playerControlsFragment, PlayerControlsFragment.FRAGMENT_TAG);
-            transaction.commit();
+            transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom)
+                    .add(R.id.container, playerControlsFragment, PlayerControlsFragment.TAG)
+                    .commit();
         } else {
             MediaSessionCompat.Callback callback = playerControlsFragment.getMediaSessionCallback();
 
@@ -114,7 +115,7 @@ public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter
         }
 
         PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList, context);
-        FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
+        FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
         fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
     }
 }

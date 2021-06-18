@@ -1,5 +1,6 @@
 package com.example.musicplayer.controlspanel;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +16,6 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -26,28 +26,29 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.MusicPlayerApp;
 import com.example.musicplayer.MusicService;
 import com.example.musicplayer.R;
 import com.example.musicplayer.ServiceConnectionCallback;
-import com.example.musicplayer.SlidingImageFragment;
-import com.example.musicplayer.controlspanel.PlayerScreenMotionLayout;
+import com.example.musicplayer.controlspanel.slidingimage.SlidingImageFragment;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class PlayerControlsFragment extends Fragment {
 
-    private static final String TAG = "PlayerControlsFragment";
-    public static final String FRAGMENT_TAG = "Playback controls fragment";
+    public static final String TAG = "PlaybackControls";
 
-    private Fragment fragment;
+    public static final String STATE_SAVED_FLAG_KEY = "saved_flag_key";
+
     private ArrayList<MediaMetadataCompat> tracksMetadata;
     private int currentPosition;
 
@@ -55,14 +56,15 @@ public class PlayerControlsFragment extends Fragment {
     private ServiceConnectionCallback connectionCallback;
     private boolean serviceConnected = false;
 
-    private MusicService.LocalBinder binder;
     private MediaSessionCompat.Callback callback;
     private MediaControllerCompat controller;
+    private MediaControllerCompat.Callback controllerCallback;
 
     private Thread updateSeekBarThread;
     private boolean threadIsRunning = false;
     private boolean seekByUser;
 
+    private MusicService.LocalBinder binder;
     private PlayerScreenMotionLayout playerControlsLayout;
     private ViewPager2 viewPager;
     private SeekBar seekBar;
@@ -94,7 +96,6 @@ public class PlayerControlsFragment extends Fragment {
                                   ServiceConnectionCallback callback) {
         super();
 
-        fragment = this;
         this.tracksMetadata = tracksMetadata;
         currentPosition = position;
         connectionCallback = callback;
@@ -110,103 +111,21 @@ public class PlayerControlsFragment extends Fragment {
                 if (connectionCallback != null) {
                     connectionCallback.onServiceConnected(name, service);
                 }
-                serviceConnected = true;
+                // saving MusicService.LocalBinder to AppContainer to retain its instance
+                // after fragment is recreated
                 binder = (MusicService.LocalBinder) service;
-                callback = binder.getMediaSessionCallback();
-                controller = binder.getMediaController();
+                AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
+                        .getApplicationContext()).appContainer;
+                container.binder = binder;
 
-                controller.registerCallback(new MediaControllerCompat.Callback() {
-                    @Override
-                    public void onPlaybackStateChanged(PlaybackStateCompat state) {
+                initializeViews(binder);
 
-                        if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
-                            if (previousPlaybackState == null || previousPlaybackState.getState() == PlaybackStateCompat.STATE_PAUSED) {
-                                minTogglePauseButton.setImageResource(R.drawable.ic_round_pause_32);
-                                togglePauseButton.setImageResource(R.drawable.play_to_pause);
-                                playToPause = (AnimatedVectorDrawable) togglePauseButton.getDrawable();
-                                playToPause.start();
-                            }
-
-                        } else if (state.getState() == PlaybackStateCompat.STATE_PAUSED) {
-                            minTogglePauseButton.setImageResource(R.drawable.ic_round_play_arrow_32);
-                            togglePauseButton.setImageResource(R.drawable.pause_to_play);
-                            pauseToPlay = (AnimatedVectorDrawable) togglePauseButton.getDrawable();
-                            pauseToPlay.start();
-                        }
-                        if (state.getState() == PlaybackStateCompat.STATE_PAUSED ||
-                                state.getState() == PlaybackStateCompat.STATE_PLAYING) {
-                            previousPlaybackState = state;
-                        }
-                    }
-
-                    @Override
-                    public void onMetadataChanged(MediaMetadataCompat metadata) {
-
-                        String title = metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
-                        String artist = metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
-                        trackTitle.setText(title);
-                        artistName.setText(artist);
-                        minTrackTitle.setText(title);
-                        minArtistName.setText(artist);
-
-                        if (viewPager.getScrollState() == ViewPager2.SCROLL_STATE_IDLE) {
-                            viewPager.setCurrentItem(binder.getCurrentQueuePosition(), false);
-                        }
-
-                        seekBar.setProgress(0);
-                        long duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
-                        seekBar.setMax((int) duration);
-                        fullDuration.setText(convertMsToString((int)duration));
-
-                        if (!updateSeekBarThread.isAlive()) {
-                            updateSeekBarThread.start();
-                        }
-                    }
-                });
-
-                nextButton.setOnClickListener(v -> {
-                    callback.onSkipToNext();
-                });
-                prevButton.setOnClickListener(v -> {
-                    callback.onSkipToPrevious();
-                });
-                togglePauseButton.setOnClickListener(v -> {
-                    callback.onPause();
-                });
-                minNextButton.setOnClickListener(v -> {
-                    callback.onSkipToNext();
-                });
-                minTogglePauseButton.setOnClickListener(v -> {
-                    callback.onPause();
-                });
-
-                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    int seekProgress;
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        seekProgress = progress;
-                        elapsedTime.setText(convertMsToString(seekProgress));
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                        seekByUser = true;
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        callback.onSeekTo(seekProgress);
-                        elapsedTime.setText(convertMsToString(seekProgress));
-                        seekByUser = false;
-                    }
-                });
-
+                // now we're ready to play a song
                 callback.onPlay();
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                Log.d(TAG, "onServiceDisconnected");
                 serviceConnected = false;
             }
         };
@@ -215,7 +134,8 @@ public class PlayerControlsFragment extends Fragment {
             threadIsRunning = true;
 
             while (threadIsRunning) {
-                if (binder.isPlaying() && !seekByUser) {
+                if (binder != null && binder.isPlaying() && !seekByUser) {
+
                     int position = binder.getCurrentPosition();
                     seekBar.setProgress(position);
                     String finalElapsed = convertMsToString(position);
@@ -233,21 +153,13 @@ public class PlayerControlsFragment extends Fragment {
         });
     }
 
-    private String convertMsToString(int ms) {
-        String elapsed = ms / 60000 + ":";
-        int seconds = (ms % 60000) / 1000;
-        if (seconds < 10)
-            elapsed += "0";
-        elapsed += Integer.toString(seconds);
-        return elapsed;
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.music_player_motion, container, false);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -282,7 +194,7 @@ public class PlayerControlsFragment extends Fragment {
                     minTogglePauseButton.setEnabled(true);
 
                 } else if (i == R.id.gone) {
-                    deletePlayerControls();
+                    deletePlayerControls(true);
 
                     if (connectionCallback != null) {
                         connectionCallback.onUnbind();
@@ -295,13 +207,13 @@ public class PlayerControlsFragment extends Fragment {
         });
 
         viewPager = view.findViewById(R.id.album_cover_picture);
-        ImageSliderAdapter adapter = new ImageSliderAdapter(getActivity());
+        ImageSliderAdapter adapter = new ImageSliderAdapter(getChildFragmentManager(), getLifecycle());
         viewPager.setAdapter(adapter);
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
 
-            private boolean newPageSelected = false;
-            private boolean userStartedDrag = false;
-            private long bufferedPosition = 0;
+            private boolean newPageSelected;
+            private boolean userStartedDrag;
+            private long bufferedPosition;
 
             @Override
             public void onPageScrollStateChanged(int state) {
@@ -345,25 +257,51 @@ public class PlayerControlsFragment extends Fragment {
         minTrackTitle = view.findViewById(R.id.min_track_title);
         minArtistName = view.findViewById(R.id.min_artist_name);
 
-        Intent intent = new Intent(getContext(), MusicService.class);
-        intent.setAction(MusicService.ACTION_CMD);
-        intent.putExtra(MusicService.CMD_NAME, MusicService.PLAY_CMD);
-
-        Bundle args = new Bundle();
-        args.putSerializable(MusicService.ARG_QUEUE, tracksMetadata);
-        args.putInt(MusicService.ARG_INDEX, currentPosition);
-        intent.putExtras(args);
-        Objects.requireNonNull(getContext()).bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
         Objects.requireNonNull(getView()).setFocusableInTouchMode(true);
         getView().requestFocus();
         getView().setOnKeyListener((v, keyCode, event) -> {
+
             if (keyCode == KeyEvent.KEYCODE_BACK && !collapsed) {
                 playerControlsLayout.transitionToStart();
                 return true;
             }
             return false;
         });
+
+        if (savedInstanceState == null || !savedInstanceState.getBoolean(STATE_SAVED_FLAG_KEY)) {
+
+            Intent intent = new Intent(getContext(), MusicService.class);
+            intent.setAction(MusicService.ACTION_CMD);
+            intent.putExtra(MusicService.CMD_NAME, MusicService.PLAY_CMD);
+
+            Bundle args = new Bundle();
+            args.putSerializable(MusicService.ARG_QUEUE, tracksMetadata);
+            args.putInt(MusicService.ARG_INDEX, currentPosition);
+            intent.putExtras(args);
+            Objects.requireNonNull(getContext()).bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        } else {
+            AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
+                    .getApplicationContext()).appContainer;
+            binder = container.binder;
+
+            if (binder != null) {
+                tracksMetadata = binder.getTrackQueue();
+
+                initializeViews(binder);
+
+                if (controller != null && controllerCallback != null) {
+                    controllerCallback.onMetadataChanged(binder.getCurrentTrackMetadata());
+                    controllerCallback.onPlaybackStateChanged(controller.getPlaybackState());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(STATE_SAVED_FLAG_KEY, true);
+        super.onSaveInstanceState(outState);
     }
 
     public MediaSessionCompat.Callback getMediaSessionCallback() {
@@ -378,7 +316,7 @@ public class PlayerControlsFragment extends Fragment {
     }
 
     public void updateViewPager() {
-        viewPager.setAdapter(new ImageSliderAdapter(Objects.requireNonNull(getActivity())));
+        viewPager.setAdapter(new ImageSliderAdapter(getChildFragmentManager(), getLifecycle()));
     }
 
     public ArrayList<MediaMetadataCompat> getTrackQueue() {
@@ -388,30 +326,127 @@ public class PlayerControlsFragment extends Fragment {
         return null;
     }
 
-    public void deletePlayerControls() {
-        Objects.requireNonNull(getContext()).unbindService(connection);
+    public void deletePlayerControls(boolean unbindService) {
+        if (unbindService) {
+            Objects.requireNonNull(getContext()).unbindService(connection);
+        }
 
         FragmentManager manager = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.remove(PlayerControlsFragment.this).commit();
     }
 
+    private void initializeViews(MusicService.LocalBinder binder) {
+        serviceConnected = true;
+        callback = binder.getMediaSessionCallback();
+        controller = binder.getMediaController();
+
+        controllerCallback = new MediaControllerCompat.Callback() {
+            @Override
+            public void onPlaybackStateChanged(PlaybackStateCompat state) {
+
+                if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
+                    if (previousPlaybackState == null || previousPlaybackState.getState() == PlaybackStateCompat.STATE_PAUSED) {
+                        minTogglePauseButton.setImageResource(R.drawable.ic_round_pause_32);
+                        togglePauseButton.setImageResource(R.drawable.play_to_pause);
+                        playToPause = (AnimatedVectorDrawable) togglePauseButton.getDrawable();
+                        playToPause.start();
+                    }
+
+                } else if (state.getState() == PlaybackStateCompat.STATE_PAUSED) {
+                    minTogglePauseButton.setImageResource(R.drawable.ic_round_play_arrow_32);
+                    togglePauseButton.setImageResource(R.drawable.pause_to_play);
+                    pauseToPlay = (AnimatedVectorDrawable) togglePauseButton.getDrawable();
+                    pauseToPlay.start();
+                }
+                if (state.getState() == PlaybackStateCompat.STATE_PAUSED ||
+                        state.getState() == PlaybackStateCompat.STATE_PLAYING) {
+
+                    previousPlaybackState = state;
+                }
+            }
+
+            @Override
+            public void onMetadataChanged(MediaMetadataCompat metadata) {
+
+                String title = metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
+                String artist = metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
+                trackTitle.setText(title);
+                artistName.setText(artist);
+                minTrackTitle.setText(title);
+                minArtistName.setText(artist);
+
+                if (viewPager != null && viewPager.getScrollState() == ViewPager2.SCROLL_STATE_IDLE) {
+                    viewPager.setCurrentItem(binder.getCurrentQueuePosition(), false);
+                }
+
+                seekBar.setProgress(0);
+                long duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+                seekBar.setMax((int) duration);
+                fullDuration.setText(convertMsToString((int) duration));
+
+                if (updateSeekBarThread != null && !updateSeekBarThread.isAlive()) {
+                    updateSeekBarThread.start();
+                }
+            }
+        };
+        controller.registerCallback(controllerCallback);
+
+        nextButton.setOnClickListener(v -> callback.onSkipToNext());
+        prevButton.setOnClickListener(v -> callback.onSkipToPrevious());
+        togglePauseButton.setOnClickListener(v -> callback.onPause());
+        minNextButton.setOnClickListener(v -> callback.onSkipToNext());
+        minTogglePauseButton.setOnClickListener(v -> callback.onPause());
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int seekProgress;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                seekProgress = progress;
+                elapsedTime.setText(convertMsToString(seekProgress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                seekByUser = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                callback.onSeekTo(seekProgress);
+                elapsedTime.setText(convertMsToString(seekProgress));
+                seekByUser = false;
+            }
+        });
+    }
+
+    private String convertMsToString(int ms) {
+        String elapsed = ms / 60000 + ":";
+        int seconds = (ms % 60000) / 1000;
+        if (seconds < 10)
+            elapsed += "0";
+        elapsed += Integer.toString(seconds);
+
+        return elapsed;
+    }
+
     private class ImageSliderAdapter extends FragmentStateAdapter {
 
-        public ImageSliderAdapter(@NonNull FragmentActivity fragmentActivity) {
-            super(fragmentActivity);
+        public ImageSliderAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+            super(fragmentManager, lifecycle);
         }
 
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            return new SlidingImageFragment(viewPager, playerControlsLayout,
-                    Uri.parse(tracksMetadata.get(position).getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI)));
+            Uri albumArt = Uri.parse(tracksMetadata.get(position).getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI));
+            return new SlidingImageFragment(viewPager, playerControlsLayout, albumArt);
         }
 
         @Override
         public int getItemCount() {
-            return tracksMetadata.size();
+            return tracksMetadata != null ? tracksMetadata.size() : 0;
         }
     }
 }

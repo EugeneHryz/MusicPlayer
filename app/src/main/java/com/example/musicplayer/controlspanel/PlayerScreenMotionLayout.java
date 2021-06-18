@@ -46,7 +46,7 @@ public class PlayerScreenMotionLayout extends MotionLayout {
 
         if (!touchHasStarted) {
             viewToDetectTouch.getHitRect(viewRect);
-            touchHasStarted = viewRect.contains((int)event.getX(), (int)event.getY());
+            touchHasStarted = viewRect.contains((int) event.getX(), (int) event.getY());
         }
         return touchHasStarted && super.onTouchEvent(event);
     }

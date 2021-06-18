@@ -4,7 +4,6 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.view.LayoutInflater;
@@ -108,7 +107,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             public boolean onQueryTextSubmit(String query) {
                 searchView.onActionViewCollapsed();
                 FragmentManager manager = getActivity().getSupportFragmentManager();
-                Fragment fragment = manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+                Fragment fragment = manager.findFragmentByTag(PlayerControlsFragment.TAG);
                 if (fragment != null) {
                     fragment.getView().setFocusableInTouchMode(true);
                     fragment.getView().requestFocus();
@@ -120,6 +119,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             public boolean onQueryTextChange(String newText) {
                 return false;
             }
+
         });
         ImageView closeButton = searchView.findViewById(R.id.search_close_btn);
         closeButton.setOnClickListener(v -> searchView.onActionViewCollapsed());
@@ -143,6 +143,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             Glide.with(view.getContext()).load(album.getAlbumCoverUri())
                     .placeholder(R.drawable.music_note_icon_light)
                     .into(new ImageViewTarget<Drawable>(imageView) {
+
                         @Override
                         protected void setResource(@Nullable Drawable resource) {
                             this.setDrawable(resource);
@@ -229,10 +230,10 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
 
             trackOptionsButton.setOnClickListener(v -> optionsMenu.show());
             optionsMenu.setOnMenuItemClickListener(item -> {
+
                 if (item.getItemId() == R.id.add_track_to_playlist_action) {
                     presenter.showBottomDialogFragment(position);
                 }
-
                 return false;
             });
 

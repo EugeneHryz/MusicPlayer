@@ -26,21 +26,45 @@ import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.DividerItemDecoration;
 import com.example.musicplayer.R;
+import com.example.musicplayer.albumlist.AlbumListPresenter;
+
+import java.util.Objects;
 
 import io.gresse.hugo.vumeterlibrary.VuMeterView;
 
 public class TrackListFragment extends Fragment implements TrackListContract.View {
+
     public static final String TAG = "TrackListFragment";
+
+    private static final String SAVED_STATE_KEY = "saved_state_key";
 
     private TrackListPresenter presenter;
     private RecyclerView recyclerView;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null && savedInstanceState.getBoolean(SAVED_STATE_KEY)) {
+
+            presenter = new TrackListPresenter(Objects.requireNonNull(getContext()), this);
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         recyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_list, container);
+
+        return recyclerView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(new TrackRecyclerViewAdapter());
@@ -48,8 +72,12 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
         recyclerView.setHasFixedSize(true);
         Transition transition = TransitionInflater.from(getContext()).inflateTransition(R.transition.shared_image);
         setSharedElementReturnTransition(transition);
+    }
 
-        return recyclerView;
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(SAVED_STATE_KEY, true);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -58,7 +86,6 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
     }
 
     public class TrackRecyclerViewAdapter extends RecyclerView.Adapter<TrackViewHolder> {
-        private static final String TAG = "TrackRecyclerAdapter";
 
         @NonNull
         @Override
@@ -91,27 +118,26 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
             optionsMenu.getMenuInflater().inflate(R.menu.track_popup_menu, optionsMenu.getMenu());
             trackOptionsButton.setOnClickListener(v -> optionsMenu.show());
             optionsMenu.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.add_track_to_playlist_action:
-                        presenter.showBottomDialogFragment(position);
-                        break;
-                }
 
+                if (item.getItemId() == R.id.add_track_to_playlist_action) {
+                    presenter.showBottomDialogFragment(position);
+                }
                 return false;
             });
 
-            // recyclerview uses a finite number of views and recycles them
-            // so we need to stop the animation if the view is used for another item in the list
-            if (metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
-                    .equals(presenter.getCurrentMediaId())) {
-                if (presenter.isPlaying()) {
-                    toggleEqualizerAnimation(view, true, true);
-                } else {
-                    toggleEqualizerAnimation(view, false, true);
-                }
-            } else {
-                toggleEqualizerAnimation(view, false, false);
-            }
+//            recyclerview uses a finite number of views and recycles them
+//            so we need to stop the animation if the view is used for another item in the list
+//            if (metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
+//                    .equals(presenter.getCurrentMediaId())) {
+//
+//                if (presenter.isPlaying()) {
+//                    toggleEqualizerAnimation(view, true, true);
+//                } else {
+//                    toggleEqualizerAnimation(view, false, true);
+//                }
+//            } else {
+//                toggleEqualizerAnimation(view, false, false);
+//            }
 
             view.setOnClickListener((v) -> {
                 presenter.play(position);

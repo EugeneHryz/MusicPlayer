@@ -1,4 +1,4 @@
-package com.example.musicplayer.controlspanel;
+package com.example.musicplayer.controlspanel.slidingimage;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -14,6 +14,7 @@ import com.example.musicplayer.Direction;
 import com.example.musicplayer.controlspanel.PlayerScreenMotionLayout;
 
 public class SlidingImageView extends androidx.appcompat.widget.AppCompatImageView {
+
     public static final String TAG = "SlidingImageView";
 
     private final GestureDetector gestureDetector;
@@ -54,7 +55,9 @@ public class SlidingImageView extends androidx.appcompat.widget.AppCompatImageVi
         if (event.getActionMasked() == MotionEvent.ACTION_UP && viewPager != null) {
             viewPager.setUserInputEnabled(true);
         }
-        motionLayout.onTouchEvent(event);
+        if (motionLayout != null) {
+            motionLayout.onTouchEvent(event);
+        }
 
         return true;
     }

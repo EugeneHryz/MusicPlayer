@@ -268,27 +268,33 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
     }
 
     public class LocalBinder extends Binder {
+
         public MediaSessionCompat.Callback getMediaSessionCallback() {
             return callback;
         }
+
         public MediaControllerCompat getMediaController() { return mediaController; }
+
         public boolean isPlaying() { return player.isPlaying(); }
+
         public int getCurrentPosition() { return player.getCurrentPosition(); }
+
         public void setTracksMetadata(ArrayList<MediaMetadataCompat> tracksQueue) { tracksMetadata = tracksQueue; }
 
         public int getCurrentQueuePosition() {
             return currentQueueIndex;
         }
-        public ArrayList<MediaMetadataCompat> getTrackQueue() { return tracksMetadata; }
-        public MediaMetadataCompat getCurrentTrackMetadata() {
 
+        public ArrayList<MediaMetadataCompat> getTrackQueue() { return tracksMetadata; }
+
+        public MediaMetadataCompat getCurrentTrackMetadata() {
             return tracksMetadata.get(currentQueueIndex);
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind");
         IBinder binder = new LocalBinder();
 
         if (intent != null) {
@@ -305,6 +311,11 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
             }
         }
         return binder;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
     }
 
     private void handleCommand(Intent intent) {

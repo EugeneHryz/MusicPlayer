@@ -86,13 +86,13 @@ public class PlaylistTrackListPresenter implements PlaylistTrackListContract.Pre
 
     private void playAfterTrackListLoaded(int position) {
         FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
-        PlayerControlsFragment fragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+        PlayerControlsFragment fragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.TAG);
 
         if (fragment == null) {
             FragmentTransaction transaction = manager.beginTransaction();
             fragment = new PlayerControlsFragment(trackList, position, null);
             transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
-            transaction.add(R.id.container, fragment, PlayerControlsFragment.FRAGMENT_TAG);
+            transaction.add(R.id.container, fragment, PlayerControlsFragment.TAG);
             transaction.commit();
         } else {
             MediaSessionCompat.Callback callback = fragment.getMediaSessionCallback();
@@ -104,13 +104,13 @@ public class PlaylistTrackListPresenter implements PlaylistTrackListContract.Pre
 
     private void updatePlaylistQueue() {
         FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
-        PlayerControlsFragment fragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+        PlayerControlsFragment fragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.TAG);
 
         if (fragment != null) {
             updateTrackQueue(fragment);
 
             if (trackList.isEmpty()) {
-                fragment.deletePlayerControls();
+                fragment.deletePlayerControls(true);
             }
         }
     }

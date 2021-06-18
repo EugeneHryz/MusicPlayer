@@ -8,6 +8,8 @@ import android.util.Pair;
 
 import androidx.core.os.HandlerCompat;
 
+import com.example.musicplayer.controlspanel.slidingimage.SlidingImageFragmentStateSaver;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -36,4 +38,8 @@ public class AppContainer {
     public final ExecutorService executorService;
 
     public final Handler mainThreadHandler;
+
+    public MusicService.LocalBinder binder;
+
+    public SlidingImageFragmentStateSaver stateSaver;
 }

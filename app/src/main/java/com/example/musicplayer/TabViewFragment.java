@@ -4,8 +4,6 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,7 +34,6 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
 
 public class TabViewFragment extends Fragment {
 
@@ -89,7 +86,7 @@ public class TabViewFragment extends Fragment {
                 searchView.onActionViewCollapsed();
                 FragmentManager manager = Objects.requireNonNull(getActivity())
                         .getSupportFragmentManager();
-                Fragment fragment = manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+                Fragment fragment = manager.findFragmentByTag(PlayerControlsFragment.TAG);
                 if (fragment != null) {
                     Objects.requireNonNull(fragment.getView()).setFocusableInTouchMode(true);
                     fragment.getView().requestFocus();
@@ -118,7 +115,7 @@ public class TabViewFragment extends Fragment {
         pagerAdapter.addFragment(albumListFragment);
 
         TrackListFragment trackListFragment = new TrackListFragment();
-        trackListFragment.setRetainInstance(true);
+//        trackListFragment.setRetainInstance(true);
         TrackListPresenter trackListPresenter = new TrackListPresenter(getContext(), trackListFragment);
         pagerAdapter.addFragment(trackListFragment);
 

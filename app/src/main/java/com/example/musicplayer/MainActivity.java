@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -44,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, REQUEST_CODE);
             }
         }
-
         updateAppContainer();
     }
 
@@ -71,13 +71,13 @@ public class MainActivity extends AppCompatActivity {
 
             FragmentManager manager = getSupportFragmentManager();
             PlayerControlsFragment fragment = (PlayerControlsFragment)
-                    manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+                    manager.findFragmentByTag(PlayerControlsFragment.TAG);
 
             if (fragment == null) {
                 FragmentTransaction transaction = manager.beginTransaction();
                 fragment = new PlayerControlsFragment(trackQueue, position, null);
                 transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
-                transaction.replace(R.id.container, fragment, PlayerControlsFragment.FRAGMENT_TAG);
+                transaction.replace(R.id.container, fragment, PlayerControlsFragment.TAG);
                 transaction.commit();
             } else {
                 MediaSessionCompat.Callback callback = fragment.getMediaSessionCallback();

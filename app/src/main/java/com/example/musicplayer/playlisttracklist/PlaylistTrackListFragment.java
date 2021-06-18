@@ -30,13 +30,10 @@ import androidx.transition.TransitionInflater;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.musicplayer.Album;
 import com.example.musicplayer.AppContainer;
-import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.DividerItemDecoration;
 import com.example.musicplayer.MusicPlayerApp;
 import com.example.musicplayer.PlaylistDataProvider;
-import com.example.musicplayer.albumtracklist.AlbumTrackListPresenter;
 import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.Playlist;
 import com.example.musicplayer.R;
@@ -104,9 +101,10 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
                 searchView.onActionViewCollapsed();
                 FragmentManager manager = getActivity().getSupportFragmentManager();
-                Fragment fragment = manager.findFragmentByTag(PlayerControlsFragment.FRAGMENT_TAG);
+                Fragment fragment = manager.findFragmentByTag(PlayerControlsFragment.TAG);
                 if (fragment != null) {
                     fragment.getView().setFocusableInTouchMode(true);
                     fragment.getView().requestFocus();

@@ -117,6 +117,7 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
                 return false;
             }
         });
+
         ImageView closeButton = searchView.findViewById(R.id.search_close_btn);
         closeButton.setOnClickListener(v -> searchView.onActionViewCollapsed());
     }
@@ -134,6 +135,7 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
 
     @Override
     public void setupChildViews() {
+
         View view = getView();
         if (view != null && trackListSize == 0) {
             postponeEnterTransition();
@@ -190,8 +192,9 @@ public class PlaylistTrackListFragment extends Fragment implements PlaylistTrack
 
             FloatingActionButton playAllButton = view.findViewById(R.id.play_all_button);
             playAllButton.setOnClickListener((v) -> {
-
+                presenter.playAll();
             });
+
             if (trackListSize == 0) {
                 playAllButton.setClickable(false);
             }

@@ -55,6 +55,7 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
     @Override
     public void onResume() {
         super.onResume();
+        updatePlaylists();
     }
 
     @SuppressLint("NotifyDataSetChanged")

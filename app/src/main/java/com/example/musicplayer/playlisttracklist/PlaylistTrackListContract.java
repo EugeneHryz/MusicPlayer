@@ -12,6 +12,8 @@ public interface PlaylistTrackListContract {
 
         void play(int position);
 
+        void playAll();
+
         Playlist getPlaylist();
 
         void deleteTrackFromPlaylist(MediaMetadataCompat trackMetadata, int position);

@@ -18,16 +18,33 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.musicplayer.Album;
+import com.example.musicplayer.DataProvider;
 import com.example.musicplayer.R;
 import com.example.musicplayer.SpacingItemDecoration;
 
+import java.util.Objects;
+
 public class AlbumListFragment extends Fragment implements AlbumListContract.View {
-    private static final String TAG = "AlbumListFragment";
+
+    public static final String TAG = "AlbumListFragment";
+
+    private static final String SAVED_STATE_KEY = "saved_state_key";
 
     private RecyclerView recyclerView;
     private AlbumListContract.Presenter presenter;
 
     public static final int SPAN_COUNT = 2;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null && savedInstanceState.getBoolean(SAVED_STATE_KEY)) {
+
+            presenter = new AlbumListPresenter(Objects.requireNonNull(getContext()),
+                    this, new DataProvider(getContext()));
+        }
+    }
 
     @Nullable
     @Override
@@ -44,6 +61,12 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
         setupRecyclerView();
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(SAVED_STATE_KEY, true);
+        super.onSaveInstanceState(outState);
+    }
+
     private void setupRecyclerView() {
         recyclerView.setLayoutManager(new GridLayoutManager(recyclerView.getContext(), SPAN_COUNT));
         recyclerView.setAdapter(new AlbumRecyclerViewAdapter());
@@ -57,8 +80,6 @@ public class AlbumListFragment extends Fragment implements AlbumListContract.Vie
     }
 
     private class AlbumRecyclerViewAdapter extends RecyclerView.Adapter<AlbumRecyclerViewAdapter.AlbumViewHolder> {
-
-        private static final String TAG = "AlbumListAdapter";
 
         @NonNull
         @Override

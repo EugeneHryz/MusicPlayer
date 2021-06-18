@@ -98,7 +98,8 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
         inflater.inflate(R.menu.menu_album_search, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        SearchManager searchManager = (SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager) Objects.requireNonNull(getContext())
+                .getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.menu_album_tracklist_search).getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), SearchableActivity.class)));
@@ -106,10 +107,12 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.onActionViewCollapsed();
-                FragmentManager manager = getActivity().getSupportFragmentManager();
+                FragmentManager manager = Objects.requireNonNull(getActivity())
+                        .getSupportFragmentManager();
                 Fragment fragment = manager.findFragmentByTag(PlayerControlsFragment.TAG);
                 if (fragment != null) {
-                    fragment.getView().setFocusableInTouchMode(true);
+                    Objects.requireNonNull(fragment.getView())
+                            .setFocusableInTouchMode(true);
                     fragment.getView().requestFocus();
                 }
                 return false;
@@ -132,13 +135,16 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
 
     @Override
     public void setupChildViews() {
+
         View view = getView();
         if (view != null && trackListSize == 0) {
             postponeEnterTransition();
             Album album = presenter.getAlbum();
 
             ImageView imageView = view.findViewById(R.id.album_cover_art);
-            imageView.setTransitionName(getArguments().getString("transition_name"));
+            if (getArguments() != null) {
+                imageView.setTransitionName(getArguments().getString("transition_name"));
+            }
 
             Glide.with(view.getContext()).load(album.getAlbumCoverUri())
                     .placeholder(R.drawable.music_note_icon_light)
@@ -178,8 +184,11 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
             recyclerView.setHasFixedSize(true);
 
             MaterialToolbar toolbar = view.findViewById(R.id.album_tracklist_toolbar);
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ((AppCompatActivity) Objects.requireNonNull(getActivity()))
+                    .setSupportActionBar(toolbar);
+            Objects.requireNonNull(((AppCompatActivity) getActivity())
+                    .getSupportActionBar())
+                    .setDisplayShowTitleEnabled(false);
             setHasOptionsMenu(true);
             toolbar.setNavigationOnClickListener((v) -> {
                 getActivity().onBackPressed();
@@ -195,7 +204,7 @@ public class AlbumTrackListFragment extends Fragment implements AlbumTrackListCo
 
             FloatingActionButton playAllButton = view.findViewById(R.id.play_all_button);
             playAllButton.setOnClickListener((v) -> {
-
+                presenter.playAll();
             });
         }
     }

@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -109,13 +110,11 @@ public class TabViewFragment extends Fragment {
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(this);
 
         AlbumListFragment albumListFragment = new AlbumListFragment();
-        albumListFragment.setRetainInstance(true);
         AlbumListPresenter albumListPresenter = new AlbumListPresenter(Objects.requireNonNull(getContext()),
                 albumListFragment, new DataProvider(getContext()));
         pagerAdapter.addFragment(albumListFragment);
 
         TrackListFragment trackListFragment = new TrackListFragment();
-//        trackListFragment.setRetainInstance(true);
         TrackListPresenter trackListPresenter = new TrackListPresenter(getContext(), trackListFragment);
         pagerAdapter.addFragment(trackListFragment);
 

@@ -61,6 +61,11 @@ public class PlaylistTrackListPresenter implements PlaylistTrackListContract.Pre
     }
 
     @Override
+    public void playAll() {
+        play(0);
+    }
+
+    @Override
     public Playlist getPlaylist() {
         return playlist;
     }

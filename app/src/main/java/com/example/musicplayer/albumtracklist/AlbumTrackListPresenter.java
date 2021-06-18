@@ -62,6 +62,11 @@ public class AlbumTrackListPresenter implements AlbumTrackListContract.Presenter
     }
 
     @Override
+    public void playAll() {
+        play(0);
+    }
+
+    @Override
     public void trackListLoadStarted() {
         view.setupChildViews();
     }

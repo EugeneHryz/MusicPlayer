@@ -12,6 +12,8 @@ public interface AlbumTrackListContract {
 
         void play(int position);
 
+        void playAll();
+
         Album getAlbum();
 
         void showBottomDialogFragment(int position);

@@ -1,8 +1,6 @@
 package com.example.musicplayer.albumlist;
 
-import android.content.Context;
-
-import com.example.musicplayer.Album;
+import com.example.musicplayer.data.Album;
 import com.example.musicplayer.BasePresenter;
 import com.example.musicplayer.BaseView;
 

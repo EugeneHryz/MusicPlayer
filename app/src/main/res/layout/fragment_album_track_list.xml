@@ -99,12 +99,13 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!--need to be fixed-->
+            <!--FIXME: hardcoded RecyclerView height need to be fixed-->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="700dp">
-            </androidx.recyclerview.widget.RecyclerView>
+                android:layout_height="700dp"
+                android:paddingBottom="66dp"
+                android:clipToPadding="false"/>
 
         </LinearLayout>
 

@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.data;
 
 import android.app.RecoverableSecurityException;
 import android.content.ContentUris;
@@ -11,10 +11,12 @@ import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
-import android.util.Pair;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.MusicPlayerApp;
+import com.example.musicplayer.R;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;

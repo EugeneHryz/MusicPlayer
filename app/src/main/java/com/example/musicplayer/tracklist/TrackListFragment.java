@@ -5,9 +5,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -26,10 +24,8 @@ import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.musicplayer.DataProvider;
-import com.example.musicplayer.DividerItemDecoration;
+import com.example.musicplayer.decoration.DividerItemDecoration;
 import com.example.musicplayer.R;
-import com.example.musicplayer.albumlist.AlbumListPresenter;
 
 import java.util.Objects;
 

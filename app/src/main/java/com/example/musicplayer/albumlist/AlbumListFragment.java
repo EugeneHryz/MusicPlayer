@@ -17,10 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.musicplayer.Album;
-import com.example.musicplayer.DataProvider;
+import com.example.musicplayer.data.Album;
+import com.example.musicplayer.data.DataProvider;
 import com.example.musicplayer.R;
-import com.example.musicplayer.SpacingItemDecoration;
+import com.example.musicplayer.decoration.SpacingItemDecoration;
 
 import java.util.Objects;
 

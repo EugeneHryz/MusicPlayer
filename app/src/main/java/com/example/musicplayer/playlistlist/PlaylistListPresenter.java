@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -14,8 +13,8 @@ import androidx.transition.TransitionInflater;
 
 import com.example.musicplayer.AppContainer;
 import com.example.musicplayer.MusicPlayerApp;
-import com.example.musicplayer.Playlist;
-import com.example.musicplayer.PlaylistDataProvider;
+import com.example.musicplayer.data.Playlist;
+import com.example.musicplayer.data.PlaylistDataProvider;
 import com.example.musicplayer.R;
 import com.example.musicplayer.playlisttracklist.PlaylistTrackListFragment;
 import com.example.musicplayer.playlisttracklist.PlaylistTrackListPresenter;

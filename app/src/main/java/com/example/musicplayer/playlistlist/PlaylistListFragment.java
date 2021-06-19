@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.musicplayer.Playlist;
-import com.example.musicplayer.PlaylistDataProvider;
+import com.example.musicplayer.data.Playlist;
+import com.example.musicplayer.data.PlaylistDataProvider;
 import com.example.musicplayer.R;
-import com.example.musicplayer.SpacingItemDecoration;
+import com.example.musicplayer.decoration.SpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.Objects;

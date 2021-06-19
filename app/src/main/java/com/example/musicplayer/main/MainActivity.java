@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.main;
 
 import android.Manifest;
 import android.content.ContentValues;
@@ -15,13 +15,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.MusicPlayerApp;
+import com.example.musicplayer.data.PlaylistDataProvider;
+import com.example.musicplayer.playlistdialog.PlaylistsBottomSheetFragment;
+import com.example.musicplayer.R;
 import com.example.musicplayer.albumtracklist.AlbumTrackListFragment;
 import com.example.musicplayer.controlspanel.PlayerControlsFragment;
+import com.example.musicplayer.data.DataProvider;
 import com.example.musicplayer.playlisttracklist.PlaylistTrackListFragment;
+import com.example.musicplayer.search.SearchableActivity;
 
 import java.util.ArrayList;
 

@@ -1,9 +1,8 @@
 package com.example.musicplayer.playlistlist;
 
-import com.example.musicplayer.Album;
 import com.example.musicplayer.BasePresenter;
 import com.example.musicplayer.BaseView;
-import com.example.musicplayer.Playlist;
+import com.example.musicplayer.data.Playlist;
 
 public interface PlaylistListContract {
 

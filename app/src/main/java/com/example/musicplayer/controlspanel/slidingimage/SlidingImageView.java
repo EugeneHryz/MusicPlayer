@@ -2,7 +2,6 @@ package com.example.musicplayer.controlspanel.slidingimage;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
@@ -10,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.musicplayer.Direction;
 import com.example.musicplayer.controlspanel.PlayerScreenMotionLayout;
 
 public class SlidingImageView extends androidx.appcompat.widget.AppCompatImageView {

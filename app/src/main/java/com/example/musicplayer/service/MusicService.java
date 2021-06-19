@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.service;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 
 import android.graphics.ImageDecoder;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -32,6 +31,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.view.KeyEvent;
 
+
+import com.example.musicplayer.R;
+import com.example.musicplayer.main.MainActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,10 +1,9 @@
-package com.example.musicplayer;
+package com.example.musicplayer.main;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,11 +20,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.musicplayer.R;
 import com.example.musicplayer.albumlist.AlbumListFragment;
 import com.example.musicplayer.albumlist.AlbumListPresenter;
 import com.example.musicplayer.controlspanel.PlayerControlsFragment;
+import com.example.musicplayer.data.DataProvider;
 import com.example.musicplayer.playlistlist.PlaylistListPresenter;
 import com.example.musicplayer.playlistlist.PlaylistListFragment;
+import com.example.musicplayer.search.SearchableActivity;
 import com.example.musicplayer.tracklist.TrackListFragment;
 import com.example.musicplayer.tracklist.TrackListPresenter;
 import com.google.android.material.appbar.MaterialToolbar;

@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.decoration;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.musicplayer.R;
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
+
     private final Drawable divider;
     private static final int SIDE_PADDING = 30;
 

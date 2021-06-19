@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.controlspanel.slidingimage;
 
 public enum Direction {
     Up,

@@ -4,7 +4,7 @@ import android.support.v4.media.MediaMetadataCompat;
 
 import com.example.musicplayer.BasePresenter;
 import com.example.musicplayer.BaseView;
-import com.example.musicplayer.Playlist;
+import com.example.musicplayer.data.Playlist;
 
 public interface PlaylistTrackListContract {
 

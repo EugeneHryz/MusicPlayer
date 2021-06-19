@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.data;
 
 import java.io.Serializable;
 

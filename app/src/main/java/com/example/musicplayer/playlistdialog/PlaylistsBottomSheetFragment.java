@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.playlistdialog;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -22,6 +22,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.MusicPlayerApp;
+import com.example.musicplayer.R;
+import com.example.musicplayer.data.Playlist;
+import com.example.musicplayer.data.PlaylistDataProvider;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;

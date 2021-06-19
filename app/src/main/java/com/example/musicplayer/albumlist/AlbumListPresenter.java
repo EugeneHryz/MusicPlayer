@@ -11,12 +11,12 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.Transition;
 import androidx.transition.TransitionInflater;
 
-import com.example.musicplayer.Album;
+import com.example.musicplayer.data.Album;
 import com.example.musicplayer.AppContainer;
-import com.example.musicplayer.DataProvider;
-import com.example.musicplayer.MusicDataProvider;
+import com.example.musicplayer.data.DataProvider;
+import com.example.musicplayer.data.MusicDataProvider;
 import com.example.musicplayer.MusicPlayerApp;
-import com.example.musicplayer.PlaylistsBottomSheetFragment;
+import com.example.musicplayer.playlistdialog.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
 import com.example.musicplayer.albumtracklist.AlbumTrackListFragment;
 import com.example.musicplayer.albumtracklist.AlbumTrackListPresenter;

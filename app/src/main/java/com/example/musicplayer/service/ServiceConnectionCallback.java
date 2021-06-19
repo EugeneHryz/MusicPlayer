@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.service;
 
 import android.content.ComponentName;
 import android.os.IBinder;

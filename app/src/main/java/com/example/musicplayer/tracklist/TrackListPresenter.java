@@ -12,14 +12,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.musicplayer.DataProvider;
-import com.example.musicplayer.MusicDataProvider;
+import com.example.musicplayer.data.DataProvider;
+import com.example.musicplayer.data.MusicDataProvider;
 import com.example.musicplayer.MusicPlayerApp;
-import com.example.musicplayer.MusicService;
+import com.example.musicplayer.service.MusicService;
 import com.example.musicplayer.controlspanel.PlayerControlsFragment;
-import com.example.musicplayer.PlaylistsBottomSheetFragment;
+import com.example.musicplayer.playlistdialog.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
-import com.example.musicplayer.ServiceConnectionCallback;
+import com.example.musicplayer.service.ServiceConnectionCallback;
 
 import java.util.ArrayList;
 
@@ -120,7 +120,10 @@ public class TrackListPresenter implements TrackListContract.Presenter,
                 playerControlsFragment.setTrackQueue(trackList);
                 playerControlsFragment.updateViewPager();
             }
-            callback.onSkipToQueueItem(position);
+
+            if (callback != null) {
+                callback.onSkipToQueueItem(position);
+            }
         }
     }
 
@@ -164,7 +167,7 @@ public class TrackListPresenter implements TrackListContract.Presenter,
         }
 
         PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList, context);
-        FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
+        FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
         fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
     }
 }

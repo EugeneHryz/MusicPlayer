@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.decoration;
 
 import android.graphics.Rect;
 import android.view.View;

@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.playlistdialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -15,6 +15,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.MusicPlayerApp;
+import com.example.musicplayer.R;
 
 import java.util.Objects;
 

@@ -8,11 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.musicplayer.Album;
-import com.example.musicplayer.DataProvider;
-import com.example.musicplayer.MusicDataProvider;
+import com.example.musicplayer.data.Album;
+import com.example.musicplayer.data.DataProvider;
+import com.example.musicplayer.data.MusicDataProvider;
 import com.example.musicplayer.controlspanel.PlayerControlsFragment;
-import com.example.musicplayer.PlaylistsBottomSheetFragment;
+import com.example.musicplayer.playlistdialog.PlaylistsBottomSheetFragment;
 import com.example.musicplayer.R;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example.musicplayer;
+package com.example.musicplayer.data;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -7,7 +7,8 @@ import android.net.Uri;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
+
+import com.example.musicplayer.R;
 
 import java.io.InputStream;
 import java.util.ArrayList;

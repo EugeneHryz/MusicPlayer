@@ -2,7 +2,7 @@ package com.example.musicplayer.albumtracklist;
 
 import android.support.v4.media.MediaMetadataCompat;
 
-import com.example.musicplayer.Album;
+import com.example.musicplayer.data.Album;
 import com.example.musicplayer.BasePresenter;
 import com.example.musicplayer.BaseView;
 

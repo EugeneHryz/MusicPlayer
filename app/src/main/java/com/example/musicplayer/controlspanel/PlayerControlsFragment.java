@@ -13,7 +13,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,9 +34,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.musicplayer.AppContainer;
 import com.example.musicplayer.MusicPlayerApp;
-import com.example.musicplayer.MusicService;
+import com.example.musicplayer.service.MusicService;
 import com.example.musicplayer.R;
-import com.example.musicplayer.ServiceConnectionCallback;
+import com.example.musicplayer.service.ServiceConnectionCallback;
 import com.example.musicplayer.controlspanel.slidingimage.SlidingImageFragment;
 
 import java.util.ArrayList;

@@ -1,14 +1,10 @@
-package com.example.musicplayer;
+package com.example.musicplayer.search;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
-import android.content.ContentUris;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.DataSetObserver;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +18,9 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.musicplayer.main.MainActivity;
+import com.example.musicplayer.R;
+import com.example.musicplayer.data.DataProvider;
 
 import java.util.ArrayList;
 

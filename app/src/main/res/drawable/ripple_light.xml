@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:color="@color/musicplayer_ripple_light"
-    tools:targetApi="lollipop">
+    android:color="@android:color/white">
 </ripple>

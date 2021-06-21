@@ -13,6 +13,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +61,8 @@ public class PlayerControlsFragment extends Fragment {
     private MediaControllerCompat.Callback controllerCallback;
 
     private Thread updateSeekBarThread;
+    private static final int THREAD_SLEEP_TIME = 500;
+
     private boolean threadIsRunning = false;
     private boolean seekByUser;
 
@@ -110,40 +113,52 @@ public class PlayerControlsFragment extends Fragment {
                 if (connectionCallback != null) {
                     connectionCallback.onServiceConnected(name, service);
                 }
-                // saving MusicService.LocalBinder to AppContainer to retain its instance
+
+                // Saving MusicService.LocalBinder to AppContainer to retain its instance
                 // after fragment is recreated
                 binder = (MusicService.LocalBinder) service;
                 AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
                         .getApplicationContext()).appContainer;
                 container.binder = binder;
 
+                // We cannot pass a lot of data to a service through intent,
+                // so we do that after the connection is established
+                binder.setTracksMetadata(tracksMetadata);
+                binder.setCurrentQueuePosition(currentPosition);
+
                 initializeViews(binder);
 
-                // now we're ready to play a song
+                // Now we're ready to play a song
                 callback.onPlay();
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 serviceConnected = false;
+                Log.d(TAG, "onServiceDisconnected");
             }
         };
 
         updateSeekBarThread = new Thread(() -> {
             threadIsRunning = true;
+            String previousTime = null;
 
             while (threadIsRunning) {
+
                 if (binder != null && binder.isPlaying() && !seekByUser) {
 
                     int position = binder.getCurrentPosition();
                     seekBar.setProgress(position);
                     String finalElapsed = convertMsToString(position);
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> elapsedTime.setText(finalElapsed));
+                    if (!finalElapsed.equals(previousTime)) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> elapsedTime.setText(finalElapsed));
+                        }
                     }
+                    previousTime = finalElapsed;
                 }
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(THREAD_SLEEP_TIME);
                 } catch (InterruptedException e) {
                     threadIsRunning = false;
                     e.printStackTrace();
@@ -256,6 +271,43 @@ public class PlayerControlsFragment extends Fragment {
         minTrackTitle = view.findViewById(R.id.min_track_title);
         minArtistName = view.findViewById(R.id.min_artist_name);
 
+        if (savedInstanceState == null || !savedInstanceState.getBoolean(STATE_SAVED_FLAG_KEY)) {
+
+            Intent intent = new Intent(getContext(), MusicService.class);
+            intent.setAction(MusicService.ACTION_CMD);
+            intent.putExtra(MusicService.CMD_NAME, MusicService.PLAY_CMD);
+
+            Bundle args = new Bundle();
+
+            ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
+            tracks.add(tracksMetadata.get(currentPosition));
+
+            // Passing large amounts of data to a service may produce
+            // TransactionTooLargeException. To avoid this we pass only the current track
+            args.putSerializable(MusicService.ARG_QUEUE, tracks);
+            args.putInt(MusicService.ARG_INDEX, 0);
+            intent.putExtras(args);
+            Objects.requireNonNull(getContext())
+                    .bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        } else {
+            AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
+                    .getApplicationContext()).appContainer;
+            binder = container.binder;
+
+            if (binder != null) {
+                tracksMetadata = binder.getTrackQueue();
+                Log.d(TAG, "Size: " + tracksMetadata.size());
+
+                initializeViews(binder);
+
+                if (controller != null && controllerCallback != null) {
+                    controllerCallback.onMetadataChanged(binder.getCurrentTrackMetadata());
+                    controllerCallback.onPlaybackStateChanged(controller.getPlaybackState());
+                }
+            }
+        }
+
         Objects.requireNonNull(getView()).setFocusableInTouchMode(true);
         getView().requestFocus();
         getView().setOnKeyListener((v, keyCode, event) -> {
@@ -267,32 +319,14 @@ public class PlayerControlsFragment extends Fragment {
             return false;
         });
 
-        if (savedInstanceState == null || !savedInstanceState.getBoolean(STATE_SAVED_FLAG_KEY)) {
+        FragmentManager manager = getChildFragmentManager();
+        ArrayList<Fragment> fragments = new ArrayList<>(manager.getFragments());
+        for (Fragment fr : fragments) {
+            if (fr instanceof SlidingImageFragment) {
 
-            Intent intent = new Intent(getContext(), MusicService.class);
-            intent.setAction(MusicService.ACTION_CMD);
-            intent.putExtra(MusicService.CMD_NAME, MusicService.PLAY_CMD);
-
-            Bundle args = new Bundle();
-            args.putSerializable(MusicService.ARG_QUEUE, tracksMetadata);
-            args.putInt(MusicService.ARG_INDEX, currentPosition);
-            intent.putExtras(args);
-            Objects.requireNonNull(getContext()).bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
-        } else {
-            AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
-                    .getApplicationContext()).appContainer;
-            binder = container.binder;
-
-            if (binder != null) {
-                tracksMetadata = binder.getTrackQueue();
-
-                initializeViews(binder);
-
-                if (controller != null && controllerCallback != null) {
-                    controllerCallback.onMetadataChanged(binder.getCurrentTrackMetadata());
-                    controllerCallback.onPlaybackStateChanged(controller.getPlaybackState());
-                }
+                SlidingImageFragment imgFragment = (SlidingImageFragment) fr;
+                imgFragment.setMotionLayout(playerControlsLayout);
+                imgFragment.setViewPager(viewPager);
             }
         }
     }
@@ -439,8 +473,16 @@ public class PlayerControlsFragment extends Fragment {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            Uri albumArt = Uri.parse(tracksMetadata.get(position).getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI));
-            return new SlidingImageFragment(viewPager, playerControlsLayout, albumArt);
+            Uri albumArt = Uri.parse(tracksMetadata.get(position)
+                    .getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI));
+
+            SlidingImageFragment fragment = new SlidingImageFragment(viewPager,
+                    playerControlsLayout);
+            Bundle args = new Bundle();
+            args.putString(SlidingImageFragment.ALBUM_COVER_KEY, albumArt.toString());
+            fragment.setArguments(args);
+
+            return fragment;
         }
 
         @Override

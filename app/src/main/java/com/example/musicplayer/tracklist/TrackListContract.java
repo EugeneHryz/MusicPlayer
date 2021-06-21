@@ -1,5 +1,6 @@
 package com.example.musicplayer.tracklist;
 
+import android.content.Context;
 import android.support.v4.media.MediaMetadataCompat;
 
 import com.example.musicplayer.BasePresenter;
@@ -16,6 +17,8 @@ public interface TrackListContract {
         boolean isPlaying();
 
         void showBottomDialogFragment(int position);
+
+        void setView(TrackListContract.View view);
     }
 
     interface View extends BaseView<TrackListPresenter> {
@@ -23,5 +26,7 @@ public interface TrackListContract {
         void toggleEqualizerAnimation(android.view.View view, boolean resume, boolean visible);
 
         void rebindItems();
+
+        Context getUpdatedContext();
     }
 }

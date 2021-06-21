@@ -1,10 +1,12 @@
 package com.example.musicplayer.tracklist;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,8 @@ import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.musicplayer.AppContainer;
+import com.example.musicplayer.MusicPlayerApp;
 import com.example.musicplayer.decoration.DividerItemDecoration;
 import com.example.musicplayer.R;
 
@@ -44,9 +48,15 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d(TAG, "onCreate");
+
         if (savedInstanceState != null && savedInstanceState.getBoolean(SAVED_STATE_KEY)) {
 
-            presenter = new TrackListPresenter(Objects.requireNonNull(getContext()), this);
+            AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
+                    .getApplicationContext()).appContainer;
+
+            presenter = container.trackListPresenter;
+            presenter.setView(this);
         }
     }
 
@@ -62,18 +72,32 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new TrackRecyclerViewAdapter());
-        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext()));
-        recyclerView.setHasFixedSize(true);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext()));
+//        recyclerView.setHasFixedSize(true);
         Transition transition = TransitionInflater.from(getContext()).inflateTransition(R.transition.shared_image);
         setSharedElementReturnTransition(transition);
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState");
+
         outState.putBoolean(SAVED_STATE_KEY, true);
         super.onSaveInstanceState(outState);
+
+        AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
+                .getApplicationContext()).appContainer;
+
+        if (container.trackListPresenter == null) {
+            container.trackListPresenter = presenter;
+        }
     }
 
     @Override
@@ -86,7 +110,9 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
         @NonNull
         @Override
         public TrackViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_track, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_track,
+                    parent, false);
+
             return new TrackViewHolder(view);
         }
 
@@ -142,7 +168,10 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
 
         @Override
         public int getItemCount() {
-            return presenter !=null ? presenter.getDataItemCount() : 0;
+            if (presenter != null) {
+                Log.d(TAG, "Size: " + presenter.getDataItemCount());
+            }
+            return presenter != null ? presenter.getDataItemCount() : 0;
         }
     }
 
@@ -184,5 +213,10 @@ public class TrackListFragment extends Fragment implements TrackListContract.Vie
         if (recyclerView != null && recyclerView.getAdapter() != null) {
             recyclerView.getAdapter().notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public Context getUpdatedContext() {
+        return getContext();
     }
 }

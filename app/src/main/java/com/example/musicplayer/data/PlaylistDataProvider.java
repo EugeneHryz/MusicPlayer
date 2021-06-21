@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 public class PlaylistDataProvider implements MusicDataProvider {
+
     private static final String TAG = "PlaylistDataProvider";
 
     private final Context context;
@@ -78,7 +80,23 @@ public class PlaylistDataProvider implements MusicDataProvider {
 
         try {
             context.getContentResolver().insert(uri, values);
+
+//            AppContainer container = ((MusicPlayerApp) context.getApplicationContext())
+//                    .appContainer;
+//
+//            ArrayList<ContentValues> savedValues = container.savedValues;
+//            if (savedValues.remove(values)) {
+//                container.valuesToInsert--;
+//            }
         } catch (SecurityException e) {
+
+
+            AppContainer container = ((MusicPlayerApp) context.getApplicationContext())
+                    .appContainer;
+            synchronized (AppContainer.class) {
+                container.savedValues.add(values);
+                container.valuesToInsert++;
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 RecoverableSecurityException rse;
@@ -86,12 +104,12 @@ public class PlaylistDataProvider implements MusicDataProvider {
                 if (e instanceof RecoverableSecurityException) {
 
                     rse = (RecoverableSecurityException)e;
-                    IntentSender intentSender = rse.getUserAction().getActionIntent()
-                            .getIntentSender();
+                    IntentSender intentSender = rse.getUserAction()
+                            .getActionIntent().getIntentSender();
                     try {
                         ((AppCompatActivity) context).startIntentSenderForResult(intentSender, requestCode,
                                 null, 0, 0, 0);
-                    } catch (IntentSender.SendIntentException exception) {
+                    } catch (IntentSender.SendIntentException | ClassCastException exception) {
                         exception.printStackTrace();
                     }
                 }
@@ -101,10 +119,11 @@ public class PlaylistDataProvider implements MusicDataProvider {
 
     public int deletePlaylist(long playlistId) {
 
-        String localStringBuilder = "_id IN (" + (playlistId) + ")";
+        String selection = "_id IN (" + playlistId + ")";
 
-        return context.getContentResolver().delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                localStringBuilder, null);
+        int result = context.getContentResolver().delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                selection, null);
+        return result;
     }
 
     public int deleteTrackFromPlaylist(long playlistId, MediaMetadataCompat metadata) {

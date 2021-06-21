@@ -122,13 +122,18 @@ public class MainActivity extends AppCompatActivity {
                 PlaylistDataProvider dataProvider = container.playlistDataProvider;
 
                 if (container.savedValues.size() == container.valuesToInsert) {
-                    Log.d(TAG, container.valuesToInsert + " " + container.playListId);
 
-                    for (ContentValues values : container.savedValues) {
+                    ArrayList<ContentValues> valuesList = new ArrayList<>(container.savedValues);
+
+                    for (ContentValues values : valuesList) {
                         dataProvider.addTrackToPlaylist(container.playListId, values,
                                 PlaylistsBottomSheetFragment.REQUEST_CODE);
                     }
-                    container.savedValues = null;
+
+                    synchronized (AppContainer.class) {
+                        container.savedValues.clear();
+                        container.valuesToInsert = 0;
+                    }
                 }
             }
         }

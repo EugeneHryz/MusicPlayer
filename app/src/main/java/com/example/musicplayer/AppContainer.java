@@ -7,10 +7,10 @@ import android.os.Looper;
 
 import androidx.core.os.HandlerCompat;
 
-import com.example.musicplayer.controlspanel.slidingimage.SlidingImageFragmentStateSaver;
 import com.example.musicplayer.data.DataProvider;
 import com.example.musicplayer.data.PlaylistDataProvider;
 import com.example.musicplayer.service.MusicService;
+import com.example.musicplayer.tracklist.TrackListPresenter;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -18,9 +18,11 @@ import java.util.concurrent.Executors;
 
 public class AppContainer {
 
+    private static final int THREAD_POOL_SIZE = 8;
+
     public AppContainer(Context context) {
 
-        executorService  = Executors.newFixedThreadPool(10);
+        executorService  = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper());
 
         dataProvider = new DataProvider(context, executorService, mainThreadHandler);
@@ -32,6 +34,7 @@ public class AppContainer {
     public long playListId;
     public int valuesToInsert;
 
+
     public PlaylistDataProvider playlistDataProvider;
 
     public DataProvider dataProvider;
@@ -42,5 +45,5 @@ public class AppContainer {
 
     public MusicService.LocalBinder binder;
 
-    public SlidingImageFragmentStateSaver stateSaver;
+    public TrackListPresenter trackListPresenter;
 }

@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
@@ -17,6 +19,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.musicplayer.AppContainer;
 import com.example.musicplayer.MusicPlayerApp;
 import com.example.musicplayer.R;
+import com.example.musicplayer.controlspanel.PlayerControlsFragment;
 import com.example.musicplayer.controlspanel.PlayerScreenMotionLayout;
 
 import java.util.Objects;
@@ -25,36 +28,33 @@ public class SlidingImageFragment extends Fragment {
 
     public static final String TAG = "SlidingImageFragment";
 
+    public static final String ALBUM_COVER_KEY = "album_cover_key";
+
     private static final String STATE_SAVED_KEY = "state_saved_key";
 
     private SlidingImageView albumCover;
     private ViewPager2 viewPager;
     private PlayerScreenMotionLayout motionLayout;
 
-    private Uri albumCoverUri;
+    private String albumCoverUri;
 
     public SlidingImageFragment() {
     }
 
-    public SlidingImageFragment(ViewPager2 viewPager, PlayerScreenMotionLayout motionLayout, Uri albumCoverUri) {
+    public SlidingImageFragment(ViewPager2 viewPager, PlayerScreenMotionLayout motionLayout) {
         super();
 
         this.viewPager = viewPager;
         this.motionLayout = motionLayout;
-        this.albumCoverUri = albumCoverUri;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(STATE_SAVED_KEY)) {
-            AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
-                    .getApplicationContext()).appContainer;
-
-            viewPager = container.stateSaver.getViewPager();
-            motionLayout = container.stateSaver.getMotionLayout();
-            albumCoverUri = container.stateSaver.getAlbumCover();
+        Bundle args = getArguments();
+        if (args != null) {
+            albumCoverUri = args.getString(ALBUM_COVER_KEY);
         }
     }
 
@@ -76,15 +76,11 @@ public class SlidingImageFragment extends Fragment {
         albumCover.setMotionLayout(motionLayout);
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putBoolean(STATE_SAVED_KEY, true);
+    public void setViewPager(ViewPager2 viewPager) {
+        this.viewPager = viewPager;
+    }
 
-        AppContainer container = ((MusicPlayerApp) Objects.requireNonNull(getContext())
-                .getApplicationContext()).appContainer;
-        container.stateSaver = new SlidingImageFragmentStateSaver(viewPager,
-                motionLayout, albumCoverUri);
-
-        super.onSaveInstanceState(outState);
+    public void setMotionLayout(PlayerScreenMotionLayout motionLayout) {
+        this.motionLayout = motionLayout;
     }
 }

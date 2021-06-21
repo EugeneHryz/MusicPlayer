@@ -143,9 +143,11 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
             @Override
             public void onPause() {
                 if (player.isPlaying()) {
+
                     player.pausePlayback();
                     mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PAUSED));
                 } else {
+
                     player.playbackNow();
                     mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_PLAYING));
                 }
@@ -154,17 +156,20 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
             @Override
             public void onSkipToNext() {
                 mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT));
+
                 if (currentQueueIndex < tracksMetadata.size() - 1) {
                     currentQueueIndex++;
                 } else {
                     currentQueueIndex = 0;
                 }
+
                 onPlay();
             }
 
             @Override
             public void onSkipToPrevious() {
                 mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS));
+
                 if (player.getCurrentPosition() < 7000) {
                     if (currentQueueIndex > 0) {
                         currentQueueIndex--;
@@ -172,11 +177,13 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
                         currentQueueIndex = tracksMetadata.size() - 1;
                     }
                 }
+
                 onPlay();
             }
 
             @Override
             public void onStop() {
+
                 mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_STOPPED));
                 mediaSession.setActive(false);
                 player.releaseMediaPlayer();
@@ -184,6 +191,7 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
             @Override
             public void onSkipToQueueItem(long id) {
+
                 mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM));
                 if (!tracksMetadata.isEmpty() && id >= 0 && id < tracksMetadata.size()) {
                     currentQueueIndex = (int)id;
@@ -193,6 +201,7 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
             @Override
             public void onSeekTo(long pos) {
+
                 player.seekTo((int) pos);
                 mediaSession.setPlaybackState(createPlaybackState(PlaybackStateCompat.STATE_BUFFERING));
             }
@@ -245,7 +254,9 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
     }
 
     private PlaybackStateCompat createPlaybackState(int state) {
+
         long playbackPos = 0;
+
         if (state != PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM
                 && state != PlaybackStateCompat.STATE_SKIPPING_TO_NEXT
                 && state != PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS
@@ -275,19 +286,33 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
             return callback;
         }
 
-        public MediaControllerCompat getMediaController() { return mediaController; }
+        public MediaControllerCompat getMediaController() {
+            return mediaController;
+        }
 
-        public boolean isPlaying() { return player.isPlaying(); }
+        public boolean isPlaying() {
+            return player.isPlaying();
+        }
 
-        public int getCurrentPosition() { return player.getCurrentPosition(); }
+        public int getCurrentPosition() {
+            return player.getCurrentPosition();
+        }
 
-        public void setTracksMetadata(ArrayList<MediaMetadataCompat> tracksQueue) { tracksMetadata = tracksQueue; }
+        public void setTracksMetadata(ArrayList<MediaMetadataCompat> tracksQueue) {
+            tracksMetadata = tracksQueue;
+        }
+
+        public void setCurrentQueuePosition(int newPos) {
+            currentQueueIndex = newPos;
+        }
 
         public int getCurrentQueuePosition() {
             return currentQueueIndex;
         }
 
-        public ArrayList<MediaMetadataCompat> getTrackQueue() { return tracksMetadata; }
+        public ArrayList<MediaMetadataCompat> getTrackQueue() {
+            return tracksMetadata;
+        }
 
         public MediaMetadataCompat getCurrentTrackMetadata() {
             return tracksMetadata.get(currentQueueIndex);
@@ -296,7 +321,7 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind");
+
         IBinder binder = new LocalBinder();
 
         if (intent != null) {
@@ -321,6 +346,7 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
     }
 
     private void handleCommand(Intent intent) {
+
         String action = intent.getAction();
         switch (action) {
             case ACTION_TOGGLEPAUSE:
@@ -348,14 +374,17 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
     }
 
     private Notification createNotification() {
+
         createNotificationChannel();
         return updateNotification();
     }
 
     private Notification updateNotification() {
+
         Bitmap artwork = null;
         String title = null;
         String artist = null;
+
         if (tracksMetadata != null) {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -398,6 +427,7 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
     }
 
     private PendingIntent getPlaybackAction(String action) {
+
         Intent intent = new Intent();
         intent.setAction(action);
 
@@ -405,14 +435,7 @@ public class MusicService extends Service implements AudioFocusChangedCallback {
     }
 
     @Override
-    public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind");
-        return true;
-    }
-
-    @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy");
         callback.onStop();
         mediaSession.release();
         unregisterReceiver(broadcastReceiver);

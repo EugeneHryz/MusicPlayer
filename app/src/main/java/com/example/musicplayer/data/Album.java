@@ -1,16 +1,14 @@
 package com.example.musicplayer.data;
 
-import android.net.Uri;
-
 import java.io.Serializable;
 
 public class Album implements Serializable {
 
     private final String title;
     private final String artist;
-    private final Uri albumCoverUri;
+    private final String albumCoverUri;
 
-    public Album(String title, String artist, Uri albumCoverUri) {
+    public Album(String title, String artist, String albumCoverUri) {
 
         this.title = title;
         this.artist = artist;
@@ -21,5 +19,5 @@ public class Album implements Serializable {
 
     public String getArtist() { return artist; }
 
-    public Uri getAlbumCoverUri() { return albumCoverUri; }
+    public String getAlbumCoverUri() { return albumCoverUri; }
 }

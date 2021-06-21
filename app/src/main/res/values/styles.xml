@@ -5,7 +5,7 @@
         <item name="colorPrimary">@color/musicplayer_purple</item>
         <item name="colorOnPrimary">@color/musicplayer_white</item>
         <!--<item name="colorPrimaryDark">@color/musicplayer_black</item>-->
-        <item name="colorPrimaryDark">@color/musicplayer_purple</item>
+        <item name="colorPrimaryDark">@color/musicplayer_purple_dark</item>
         <item name="android:colorBackground">@color/musicplayer_dark_gray</item>
         <item name="android:textColorSecondary">@color/musicplayer_white</item>
 

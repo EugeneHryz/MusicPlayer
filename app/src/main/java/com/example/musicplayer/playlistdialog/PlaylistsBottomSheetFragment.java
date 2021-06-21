@@ -122,7 +122,7 @@ public class PlaylistsBottomSheetFragment extends BottomSheetDialogFragment impl
             base = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Playlists.Members.PLAY_ORDER)) + 1;
         }
 
-        container.valuesToInsert = trackList.size();
+        container.valuesToInsert = 0;
         container.playListId = playlistId;
         container.savedValues = new ArrayList<>();
 
@@ -136,9 +136,9 @@ public class PlaylistsBottomSheetFragment extends BottomSheetDialogFragment impl
 
             playlistDataProvider.addTrackToPlaylist(playlistId, values, REQUEST_CODE);
 
-            if (container.savedValues != null) {
-                container.savedValues.add(values);
-            }
+//            if (container.savedValues != null) {
+//                container.savedValues.add(values);
+//            }
             base++;
         }
     }

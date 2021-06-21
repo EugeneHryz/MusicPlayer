@@ -7,6 +7,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -29,8 +30,7 @@ public class TrackListPresenter implements TrackListContract.Presenter,
     public static final String TAG = "TrackListPresenter";
 
     private final DataProvider dataProvider;
-    private final TrackListContract.View view;
-    private final Context context;
+    private TrackListContract.View view;
     private ArrayList<MediaMetadataCompat> trackList;
 
     private boolean playRequest = false;
@@ -43,10 +43,10 @@ public class TrackListPresenter implements TrackListContract.Presenter,
     private final MediaControllerCompat.Callback controllerCallback;
 
     public TrackListPresenter(Context context, TrackListContract.View view) {
-        this.context = context;
+        this.view = view;
         this.dataProvider = ((MusicPlayerApp) context.getApplicationContext())
                 .appContainer.dataProvider;
-        this.view = view;
+
 
         dataProvider.getTrackListAsynchronous(null, this);
 
@@ -103,11 +103,12 @@ public class TrackListPresenter implements TrackListContract.Presenter,
     }
 
     private void playAfterTrackListLoaded(int position) {
-        FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
+        FragmentManager manager = ((AppCompatActivity) view.getUpdatedContext()).getSupportFragmentManager();
         PlayerControlsFragment playerControlsFragment = (PlayerControlsFragment) manager.findFragmentByTag(PlayerControlsFragment.TAG);
 
         if (playerControlsFragment == null) {
             FragmentTransaction transaction = manager.beginTransaction();
+
             playerControlsFragment = new PlayerControlsFragment(trackList, position, this);
             transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom);
             transaction.add(R.id.container, playerControlsFragment, PlayerControlsFragment.TAG);
@@ -166,8 +167,13 @@ public class TrackListPresenter implements TrackListContract.Presenter,
             trackList.add(this.trackList.get(position));
         }
 
-        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList, context);
-        FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
+        PlaylistsBottomSheetFragment fragment = new PlaylistsBottomSheetFragment(trackList, view.getUpdatedContext());
+        FragmentManager manager = ((AppCompatActivity) view.getUpdatedContext()).getSupportFragmentManager();
         fragment.showNow(manager, PlaylistsBottomSheetFragment.TAG);
+    }
+
+    @Override
+    public void setView(TrackListContract.View view) {
+        this.view = view;
     }
 }

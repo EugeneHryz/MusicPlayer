@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +72,7 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
+
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), SPAN_COUNT));
         recyclerView.setAdapter(new PlaylistRecyclerViewAdapter());
         SpacingItemDecoration itemDecoration = new SpacingItemDecoration((int) getResources().getDimension(R.dimen.grid_item_spacing), SPAN_COUNT);
@@ -78,7 +80,6 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
     }
 
     private class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistListFragment.PlaylistRecyclerViewAdapter.PlaylistViewHolder> {
-        private static final String TAG = "PlaylistAdapter";
 
         public PlaylistRecyclerViewAdapter() {
             super();
@@ -99,6 +100,7 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
             View view = holder.getView();
 
             Playlist playlist = playlists.get(position);
+
             if (playlist != null) {
                 TextView playlistTitle = view.findViewById(R.id.playlist_name_card);
                 TextView tracksNumber = view.findViewById(R.id.playlist_tracks_number);
@@ -127,6 +129,8 @@ public class PlaylistListFragment extends Fragment implements PlaylistListContra
                 optionsMenu.setOnMenuItemClickListener(item -> {
 
                     if (item.getItemId() == R.id.delete_action) {
+
+                        Log.d(TAG, "playlist id: " + playlist.getId());
                         presenter.deletePlaylist(playlist.getId(), position);
                     }
                     return false;

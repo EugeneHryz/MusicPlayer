@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
 public class PlaylistListPresenter implements PlaylistListContract.Presenter {
+
     private static final String TAG = "PlaylistListPresenter";
 
     private final ExecutorService executorService;
@@ -35,10 +36,11 @@ public class PlaylistListPresenter implements PlaylistListContract.Presenter {
     public PlaylistListPresenter(Context context, PlaylistListContract.View view) {
         AppContainer container = ((MusicPlayerApp) context.getApplicationContext()).appContainer;
 
-        this.playlistDataProvider = container.playlistDataProvider;
         this.view = view;
-        this.executorService = container.executorService;
-        this.mainThreadHandler = container.mainThreadHandler;
+        executorService = container.executorService;
+        mainThreadHandler = container.mainThreadHandler;
+        this.playlistDataProvider = new PlaylistDataProvider(context, executorService,
+                mainThreadHandler);
 
         start();
 
@@ -99,6 +101,7 @@ public class PlaylistListPresenter implements PlaylistListContract.Presenter {
     @Override
     public int getTracksNumber(long playlistId) {
         int tracksNumber = 0;
+
         Cursor cursor = playlistDataProvider.queryTracksFromPlaylist(playlistId);
         if (cursor != null) {
             tracksNumber = cursor.getCount();

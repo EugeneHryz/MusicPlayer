@@ -65,7 +65,7 @@ public class DataProvider implements MusicDataProvider {
                 Uri albumCoverUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
 
                 if (!hasAlbumWithTitle(albumList, title)) {
-                    albumList.add(new Album(title, artist, albumCoverUri));
+                    albumList.add(new Album(title, artist, albumCoverUri.toString()));
                 }
             }
         }

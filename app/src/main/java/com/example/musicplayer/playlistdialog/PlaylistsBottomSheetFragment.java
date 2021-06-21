@@ -135,10 +135,6 @@ public class PlaylistsBottomSheetFragment extends BottomSheetDialogFragment impl
             values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, audioId);
 
             playlistDataProvider.addTrackToPlaylist(playlistId, values, REQUEST_CODE);
-
-//            if (container.savedValues != null) {
-//                container.savedValues.add(values);
-//            }
             base++;
         }
     }

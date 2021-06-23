@@ -13,6 +13,8 @@ Features include:
 
 # Screenshots
 
+The design is inspired by the Google Play Music app.
+
 ![Albums](readme_images/albums.png "Albums")
 ![Tracks](readme_images/tracks.png "Tracks")
 ![Playlists](readme_images/playlists.png "Playlists")

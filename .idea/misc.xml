@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/drawable/ic_music_note.xml" value="0.25" />
+        <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/drawable/item_divider.xml" value="0.2125" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/drawable/pause_to_play.xml" value="0.2125" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/drawable/play_to_pause.xml" value="0.2125" />
         <entry key="..\:/AndroidStudioProjects/MusicPlayer/app/src/main/res/drawable/ripple_light.xml" value="0.2125" />

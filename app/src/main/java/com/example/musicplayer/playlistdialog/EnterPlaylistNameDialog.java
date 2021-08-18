@@ -57,6 +57,10 @@ public class EnterPlaylistNameDialog extends DialogFragment {
                     playlistId = Long.parseLong(uri.substring(uri.lastIndexOf("/") + 1));
 
                     Toast.makeText(getContext(), "Playlist created", Toast.LENGTH_SHORT).show();
+                    
+                    if (listener != null) {
+                        listener.onNameEntered(playlistId);
+                    }
                 });
 
         return dialogBuilder.create();
@@ -65,9 +69,6 @@ public class EnterPlaylistNameDialog extends DialogFragment {
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-        if (listener != null) {
-            listener.onNameEntered(playlistId);
-        }
 
         InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getActivity())
                 .getSystemService(Context.INPUT_METHOD_SERVICE);

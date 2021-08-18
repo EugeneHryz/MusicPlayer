@@ -34,6 +34,7 @@ import java.util.concurrent.Executor;
 
 public class PlaylistsBottomSheetFragment extends BottomSheetDialogFragment implements
         EnterPlaylistNameDialog.EnterPlaylistNameListener {
+
     public static final String TAG = "BottomSheetFragment";
 
     public static final int REQUEST_CODE = 3;
